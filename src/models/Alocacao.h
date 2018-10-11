@@ -6,8 +6,20 @@
 #define NETFLIX_LSS_ALOCACAO_H
 
 
+#include <string>
+#include <vector>
+#include "Filme.h"
+#include "cliente.h"
+
 class Alocacao {
-private:
+public:
+  int id;
+  std::string alocante;
+  std::string dataInicial;
+  std::string dataFinal;
+  std::string filmes;
+
+  double valor;
 
 };
 

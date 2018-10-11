@@ -7,7 +7,10 @@
 
 #include <string>
 #include <vector>
+#include <nlohmann/json.hpp>
 #include "Filme.h"
+
+using Json = nlohmann::json;
 
 class Cliente {
 public:
@@ -20,6 +23,11 @@ public:
     double divida = 0;
 
     Cliente();
+
+    static Cliente fromJson(std::string json);
+
+    std::string toJson();
+
 };
 
 #endif //NETFLIX_LSS_CLIENTE_H
