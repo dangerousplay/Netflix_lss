@@ -2,11 +2,19 @@
 #include <sqlite_orm/sqlite_orm.h>
 #include "models/cliente.h"
 #include "models/Filme.h"
+#include <nlohmann/json.hpp>
 
 using namespace sqlite_orm;
 
+using json = nlohmann::json;
+
 int main() {
-    auto storage = make_storage("db.sqlite",
+
+    json t;
+    t["pi"] = 3.45;
+
+    std::cout << t;
+    /*auto storage = make_storage("db.sqlite",
                                 make_table("clientes",
                                            make_column("id", &Cliente::id, autoincrement(), primary_key()),
                                            make_column("nome", &Cliente::nome),
@@ -36,7 +44,7 @@ int main() {
 
     } catch (std::exception e){
         std::cout << e.what() << std::endl;
-    }
+    }*/
 
 
     return 0;
