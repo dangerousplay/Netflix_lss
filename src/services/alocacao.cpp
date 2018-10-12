@@ -6,7 +6,9 @@
 #include "../db/init.h"
 
 Alocacao* ServicoLocadora::alocarFilmes(Cliente cliente, std::vector<Filme> filmes) {
-  return {};
+  return {
+
+  };
 }
 
 bool ServicoLocadora::quitarDivida(Cliente cliente) {
@@ -24,3 +26,5 @@ bool ServicoLocadora::pagarDivida(Cliente cliente, double valor) {
 std::vector<Alocacao> ServicoLocadora::allocacoesEmAtraso(Cliente cliente) {
   return std::vector<Alocacao>();
 }
+
+ServicoLocadora::ServicoLocadora() = default;

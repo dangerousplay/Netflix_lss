@@ -7,10 +7,8 @@
 
 #include <string>
 #include <vector>
-#include <nlohmann/json.hpp>
-#include "Filme.h"
 
-using Json = nlohmann::json;
+#include "Filme.h"
 
 class Cliente {
 public:

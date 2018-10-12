@@ -14,13 +14,20 @@
 class Alocacao {
 public:
   int id;
-  std::string alocante;
+  int clienteId;
   std::string dataInicial;
   std::string dataFinal;
   std::string filmes;
-
   double valor;
 
+  Alocacao(int id, int clienteId, const std::string &dataInicial, const std::string &dataFinal,
+             const std::string &filmes, double valor);
+
+  Alocacao();
+
+  static Alocacao fromJson(std::string json);
+
+  std::string toJson();
 };
 
 

@@ -4,6 +4,10 @@
 
 #include "cliente.h"
 
+#include <nlohmann/json.hpp>
+
+using Json = nlohmann::json;
+
 Cliente::Cliente(int id, const std::string &nome, const std::string &endereco, double divida) : id(id), nome(nome),
                                                                                                 endereco(endereco),
                                                                                                 divida(divida) {

@@ -9,6 +9,7 @@
 class ServicoLocadora {
 private:
   ServicoLocadora();
+
 public:
   Alocacao* alocarFilmes(Cliente cliente, std::vector<Filme> filmes);
 

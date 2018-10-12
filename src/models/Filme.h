@@ -8,6 +8,7 @@
 
 #include <string>
 
+
 class Filme {
 public:
     int id;
@@ -17,6 +18,13 @@ public:
     std::string sinopse;
     std::string genero;
 
+    Filme();
+
+    Filme(int id, const std::string &nome, double valor, const std::string &anoLancamento, const std::string &sinopse,
+          const std::string &genero);
+
+    std::string toJson();
+    static Filme fromJson(std::string json);
 };
 
 
