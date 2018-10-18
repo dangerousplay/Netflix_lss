@@ -1,3 +1,5 @@
+Componentes do Grupo: Davi Henrique, Josué William e Moisés Alcides
+
 
 You will need bincrafters remote repository added on conan
 

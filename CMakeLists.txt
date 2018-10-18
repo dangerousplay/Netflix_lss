@@ -22,6 +22,6 @@ add_executable(${PROJECT_NAME}
         src/imgui/imgui_impl_glfw.h
         src/imgui/imgui_impl_opengl3.cpp
         src/imgui/imgui_impl_opengl3.h
-        )
+        src/menus/filme.cpp src/menus/filme.h src/menus/IMenu.h src/menus/cliente.cpp src/menus/cliente.h src/menus/alocacao.cpp src/menus/alocacao.h src/menus/IMenu.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS})
