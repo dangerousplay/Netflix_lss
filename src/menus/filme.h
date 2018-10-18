@@ -14,6 +14,7 @@ private:
     Filme atual;
     std::vector<Filme> filmes;
     bool editando = false;
+    bool open = true;
 public:
 
     FilmeMenu();
@@ -21,6 +22,10 @@ public:
     void render() override;
 
     std::vector<Filme> getFilmes();
+
+    bool isOpen() const;
+
+    void setOpen(bool open);
 };
 
 #endif

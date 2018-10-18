@@ -7,6 +7,11 @@
 
 #define BUFFER_SIZE 100
 
+std::vector<char> generoBuffer(BUFFER_SIZE);
+std::vector<char> sinopseBuffer(BUFFER_SIZE);
+std::vector<char> anoBuffer(BUFFER_SIZE);
+std::vector<char> nomeBuffer(BUFFER_SIZE);
+
 FilmeMenu::FilmeMenu() {
 
 }
@@ -26,13 +31,13 @@ std::vector<Filme> FilmeMenu::getFilmes() {
             }*/
 
 void FilmeMenu::render() {
-    ImGui::Begin("Filmes");
+    bool& open = FilmeMenu::open;
+
+    ImGui::SetNextWindowSize(ImVec2(400,500),0);
+
+    ImGui::Begin("Filmes", &open);
 
     if(ImGui::CollapsingHeader("Cadastrar e Editar Filme")) {
-        std::vector<char> generoBuffer(BUFFER_SIZE);
-        std::vector<char> sinopseBuffer(BUFFER_SIZE);
-        std::vector<char> anoBuffer(BUFFER_SIZE);
-        std::vector<char> nomeBuffer(BUFFER_SIZE);
 
         ImGui::Text("Nome:");
 
@@ -74,4 +79,42 @@ void FilmeMenu::render() {
         }
     }
 
+    ImGui::Separator();
+    ImGui::Separator();
+
+    {
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
+        ImGui::BeginChild("Child2", ImVec2(0,300));
+        /*if (ImGui::BeginMenuBar())
+        {
+            if (ImGui::BeginMenu("Menu"))
+            {
+                ShowExampleMenuFile();
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }*/
+
+        ImGui::Columns(3);
+        for (int i = 0; i < 100; i++)
+        {
+            char buf[32];
+            sprintf(buf, "%03d", i);
+            ImGui::Button(buf, ImVec2(-1.0f, 0.0f));
+            ImGui::NextColumn();
+        }
+        ImGui::EndChild();
+        ImGui::PopStyleVar();
+    }
+
+    ImGui::TreePop();
+
+}
+
+bool FilmeMenu::isOpen() const {
+    return open;
+}
+
+void FilmeMenu::setOpen(bool open) {
+    FilmeMenu::open = open;
 }

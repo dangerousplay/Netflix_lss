@@ -115,6 +115,10 @@ int main(int, char**)
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+    auto filmeMenu = std::make_shared<FilmeMenu>();
+
+    std::vector<std::shared_ptr<IMenu>> menus = { filmeMenu };
+
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
@@ -134,12 +138,8 @@ int main(int, char**)
         if (show_demo_window)
             ImGui::ShowDemoWindow(&show_demo_window);
 
-        std::vector<IMenu> menus;
-
-        menus.push_back(FilmeMenu());
-
-        for(auto menu : menus){
-            menu.render();
+        for(const auto &menu : menus){
+            menu->render();
         }
 
         // Rendering

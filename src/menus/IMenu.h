@@ -6,12 +6,14 @@
 #define IMENU_HEADER
 
 
+#include <iostream>
+
 class IMenu {
 public:
     IMenu() = default;
 
     virtual void render(){
-
+        std::cout << "Not Implemented" << std::endl;
     }
 };
 

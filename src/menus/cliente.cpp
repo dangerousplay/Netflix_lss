@@ -4,10 +4,9 @@
 
 #include "cliente.h"
 
-ClienteMenu::ClienteMenu() : IMenu() {
-
-}
+ClienteMenu::ClienteMenu() = default;
 
 void ClienteMenu::render() {
 
 }
+

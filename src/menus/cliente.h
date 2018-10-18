@@ -7,7 +7,12 @@
 
 #include "IMenu.h"
 
+class ClienteMenu : public IMenu {
+public:
+    ClienteMenu();
 
+    void render() override;
+};
 
 #endif
 

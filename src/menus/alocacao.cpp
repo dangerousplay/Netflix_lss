@@ -4,9 +4,7 @@
 
 #include "alocacao.h"
 
-AlocacaoMenu::AlocacaoMenu() {
-
-}
+AlocacaoMenu::AlocacaoMenu() = default;
 
 void AlocacaoMenu::render() {
 
