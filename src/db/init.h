@@ -15,7 +15,6 @@ using namespace sqlite_orm;
 
 class Database {
 private:
-  static std::unique_ptr<Database> instance;
   internal::storage_t<table_t<internal::column_t<Cliente, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, double>>, table_t<internal::column_t<Filme, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, double>, internal::column_t<Filme, std::string>>, table_t<internal::column_t<Alocacao, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Alocacao, int>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, double>>> storage = initDatabase("db.sqlite");
 
   static internal::storage_t<table_t<internal::column_t<Cliente, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, double>>, table_t<internal::column_t<Filme, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, double>, internal::column_t<Filme, std::string>>, table_t<internal::column_t<Alocacao, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Alocacao, int>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, double>>>
@@ -52,17 +51,15 @@ private:
   }
 public:
 
-  static const std::unique_ptr<Database> &getInstance() {
-    if(Database::instance == nullptr)
-      Database::instance = std::make_unique<Database>();
-
-    return instance;
-  }
-
   internal::storage_t<table_t<internal::column_t<Cliente, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, double>>, table_t<internal::column_t<Filme, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, double>, internal::column_t<Filme, std::string>>, table_t<internal::column_t<Alocacao, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Alocacao, int>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, double>>>
   getStorage() const {
     return storage;
   }
 };
+
+#ifndef DB_INSTANCE
+#define DB_INSTANCE
+std::unique_ptr<Database> dbInstance = std::make_unique<Database>();
+#endif
 
 #endif

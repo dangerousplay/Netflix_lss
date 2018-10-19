@@ -3,7 +3,6 @@
 //
 
 #include "alocacao.h"
-#include "../db/init.h"
 
 Alocacao* ServicoLocadora::alocarFilmes(Cliente cliente, std::vector<Filme> filmes) {
   return {

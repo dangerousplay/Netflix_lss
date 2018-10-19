@@ -4,6 +4,7 @@
 
 #include <imgui.h>
 #include "filme.h"
+#include "../db/init.h"
 
 #define BUFFER_SIZE 100
 
@@ -13,7 +14,7 @@ std::vector<char> anoBuffer(BUFFER_SIZE);
 std::vector<char> nomeBuffer(BUFFER_SIZE);
 
 FilmeMenu::FilmeMenu() {
-
+    FilmeMenu::filmes = dbInstance->getStorage().get_all<Filme>();
 }
 
 std::vector<Filme> FilmeMenu::getFilmes() {
@@ -82,7 +83,15 @@ void FilmeMenu::render() {
     ImGui::Separator();
     ImGui::Separator();
 
+    char* buffer = (char*)calloc(512, sizeof(char));
+
+    ImGui::Text("Pesquisar: ");
+    ImGui::InputText("Pesquisar", buffer, 512);
+
     {
+
+        std::string filter = buffer;
+
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
         ImGui::BeginChild("Child2", ImVec2(0,300));
         /*if (ImGui::BeginMenuBar())
@@ -95,7 +104,19 @@ void FilmeMenu::render() {
             ImGui::EndMenuBar();
         }*/
 
-        ImGui::Columns(3);
+        ImGui::Columns(5);
+        std::vector<Filme> filtered;
+
+        std::copy_if(FilmeMenu::filmes.begin(), FilmeMenu::filmes.end(), &filtered[0], [filter](Filme filme){
+            return filter.empty() ? true :
+            filter.find(std::to_string(filme.valor)) ? true :
+            filter.find(filme.genero) ? true :
+            filter.find(filme.nome) ? true :
+            filter.find(filme.sinopse) ? true :
+            filter.find(filme.anoLancamento) != 0;
+
+        });
+
         for (int i = 0; i < 100; i++)
         {
             char buf[32];
