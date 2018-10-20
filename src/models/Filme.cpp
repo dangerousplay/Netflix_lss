@@ -35,6 +35,7 @@ Filme::Filme(int id, const std::string &nome, double valor, const std::string &a
 }
 
 Filme::Filme() {
-
+    Filme::id = -1;
+    Filme::valor = 0;
 }
 

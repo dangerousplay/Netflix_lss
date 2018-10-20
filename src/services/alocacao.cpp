@@ -4,7 +4,7 @@
 
 #include "alocacao.h"
 
-Alocacao* ServicoLocadora::alocarFilmes(Cliente cliente, std::vector<Filme> filmes) {
+std::shared_ptr<Alocacao> ServicoLocadora::alocarFilmes(Cliente cliente, std::vector<Filme> filmes) {
   return {
 
   };

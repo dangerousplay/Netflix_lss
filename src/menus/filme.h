@@ -15,6 +15,10 @@ private:
     std::vector<Filme> filmes;
     bool editando = false;
     bool open = true;
+
+    void updateFilmes();
+    void clearFilme();
+    void editMenu(Filme filme);
 public:
 
     FilmeMenu();

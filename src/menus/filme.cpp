@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by aluno on 17/10/18.
 //
@@ -12,6 +14,8 @@ std::vector<char> generoBuffer(BUFFER_SIZE);
 std::vector<char> sinopseBuffer(BUFFER_SIZE);
 std::vector<char> anoBuffer(BUFFER_SIZE);
 std::vector<char> nomeBuffer(BUFFER_SIZE);
+
+std::shared_ptr<char> buffer(new char[512]);
 
 FilmeMenu::FilmeMenu() {
     FilmeMenu::filmes = dbInstance->getStorage().get_all<Filme>();
@@ -34,13 +38,19 @@ std::vector<Filme> FilmeMenu::getFilmes() {
 void FilmeMenu::render() {
     bool& open = FilmeMenu::open;
 
-    ImGui::SetNextWindowSize(ImVec2(400,500),0);
+    ImGui::SetNextWindowSize(ImVec2(700,500),0);
 
     ImGui::Begin("Filmes", &open);
+
+
 
     if(ImGui::CollapsingHeader("Cadastrar e Editar Filme")) {
 
         ImGui::Text("Nome:");
+
+        std::copy(FilmeMenu::atual.nome.begin(),FilmeMenu::atual.nome.end(), nomeBuffer.begin());
+        std::copy(FilmeMenu::atual.anoLancamento.begin(),FilmeMenu::atual.anoLancamento.end(), anoBuffer.begin());
+        std::copy(FilmeMenu::atual.genero.begin(),FilmeMenu::atual.genero.end(), generoBuffer.begin());
 
         if(ImGui::InputText("Nome", &nomeBuffer[0], nomeBuffer.size())){
             FilmeMenu::atual.nome = &nomeBuffer[0];
@@ -70,12 +80,17 @@ void FilmeMenu::render() {
         if(editando){
             if(ImGui::Button("Editar Filme")){
                 FilmeMenu::editando = false;
+                dbInstance->getStorage().update<Filme>(FilmeMenu::atual);
+                updateFilmes();
 
-                //TODO Implement Save Logic
+                clearFilme();
             }
         } else {
             if(ImGui::Button("Salvar Filme")){
-                //TODO Implement Save Logic
+                dbInstance->getStorage().insert<Filme>(FilmeMenu::atual);
+                updateFilmes();
+
+                clearFilme();
             }
         }
     }
@@ -83,31 +98,30 @@ void FilmeMenu::render() {
     ImGui::Separator();
     ImGui::Separator();
 
-    char* buffer = (char*)calloc(512, sizeof(char));
-
     ImGui::Text("Pesquisar: ");
-    ImGui::InputText("Pesquisar", buffer, 512);
+    ImGui::InputText("Pesquisar", buffer.get(), 512);
 
     {
 
-        std::string filter = buffer;
+        std::string filter = buffer.get();
 
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
         ImGui::BeginChild("Child2", ImVec2(0,300));
-        /*if (ImGui::BeginMenuBar())
+
+        if (ImGui::BeginMenuBar())
         {
             if (ImGui::BeginMenu("Menu"))
             {
-                ShowExampleMenuFile();
+
                 ImGui::EndMenu();
             }
             ImGui::EndMenuBar();
-        }*/
+        }
 
-        ImGui::Columns(5);
-        std::vector<Filme> filtered;
+        ImGui::Columns(7);
+        std::vector<Filme> filtered(FilmeMenu::filmes.capacity());
 
-        std::copy_if(FilmeMenu::filmes.begin(), FilmeMenu::filmes.end(), &filtered[0], [filter](Filme filme){
+        std::copy_if(FilmeMenu::filmes.begin(), FilmeMenu::filmes.end(), filtered.begin(), [filter](Filme filme){
             return filter.empty() ? true :
             filter.find(std::to_string(filme.valor)) ? true :
             filter.find(filme.genero) ? true :
@@ -117,13 +131,43 @@ void FilmeMenu::render() {
 
         });
 
-        for (int i = 0; i < 100; i++)
-        {
-            char buf[32];
-            sprintf(buf, "%03d", i);
-            ImGui::Button(buf, ImVec2(-1.0f, 0.0f));
+        for(auto filme: filtered){
+            ImGui::Text(filme.nome.c_str());
+
+            ImGui::NextColumn();
+
+            ImGui::Text(filme.anoLancamento.c_str());
+
+            ImGui::NextColumn();
+
+            ImGui::Text(filme.sinopse.c_str());
+
+            ImGui::NextColumn();
+
+            ImGui::Text(filme.genero.c_str());
+
+            ImGui::NextColumn();
+
+            ImGui::Text(std::to_string(filme.valor).c_str());
+
+            ImGui::NextColumn();
+
+            if(ImGui::Button("Alterar")){
+                FilmeMenu::editando = true;
+                FilmeMenu::atual = filme;
+            }
+
+            ImGui::NextColumn();
+
+            if(ImGui::Button("Remover")){
+                dbInstance->getStorage().remove<Filme>(filme.id);
+
+                updateFilmes();
+            }
+
             ImGui::NextColumn();
         }
+
         ImGui::EndChild();
         ImGui::PopStyleVar();
     }
@@ -132,10 +176,37 @@ void FilmeMenu::render() {
 
 }
 
+void FilmeMenu::editMenu(Filme filme){
+   ImGui::OpenPopup("Gerenciar Filme");
+
+        if (ImGui::Selectable("Deletar Filme")){
+            dbInstance->getStorage().remove<Filme>(filme.id);
+
+            updateFilmes();
+        }
+
+        if (ImGui::Selectable("Alterar Filme")){
+            FilmeMenu::editando = true;
+            FilmeMenu::atual = filme;
+        }
+
+        ImGui::PushItemWidth(-1);
+        ImGui::PopItemWidth();
+        ImGui::EndPopup();
+}
+
 bool FilmeMenu::isOpen() const {
     return open;
 }
 
 void FilmeMenu::setOpen(bool open) {
     FilmeMenu::open = open;
+}
+
+void FilmeMenu::updateFilmes() {
+    FilmeMenu::filmes = dbInstance->getStorage().get_all<Filme>();
+}
+
+void FilmeMenu::clearFilme() {
+    FilmeMenu::atual = Filme();
 }
