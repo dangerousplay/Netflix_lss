@@ -7,6 +7,8 @@
 #include <imgui.h>
 #include "filme.h"
 #include "../db/init.h"
+#include "../utils/stringUtils.h"
+
 
 #define BUFFER_SIZE 100
 
@@ -35,22 +37,55 @@ std::vector<Filme> FilmeMenu::getFilmes() {
                 ImGui::EndPopup();
             }*/
 
+void FilmeMenu::refreshBuffers(){
+    std::copy(FilmeMenu::atual.nome.begin(),FilmeMenu::atual.nome.end(), nomeBuffer.begin());
+    std::copy(FilmeMenu::atual.anoLancamento.begin(),FilmeMenu::atual.anoLancamento.end(), anoBuffer.begin());
+    std::copy(FilmeMenu::atual.genero.begin(),FilmeMenu::atual.genero.end(), generoBuffer.begin());
+    std::copy(FilmeMenu::atual.sinopse.begin(),FilmeMenu::atual.sinopse.end(), sinopseBuffer.begin());
+
+    std::fill(nomeBuffer.begin() + FilmeMenu::atual.nome.size(), nomeBuffer.end(), '\0');
+    std::fill(anoBuffer.begin() + FilmeMenu::atual.anoLancamento.size(), anoBuffer.end(), '\0');
+    std::fill(generoBuffer.begin() + FilmeMenu::atual.genero.size(), generoBuffer.end(), '\0');
+    std::fill(sinopseBuffer.begin() + FilmeMenu::atual.sinopse.size(), sinopseBuffer.end(), '\0');
+}
+
+template<typename charT>
+struct my_equal {
+    my_equal( const std::locale& loc ) : loc_(loc) {}
+    bool operator()(charT ch1, charT ch2) {
+        return std::toupper(ch1, loc_) == std::toupper(ch2, loc_);
+    }
+private:
+    const std::locale& loc_;
+};
+
+// find substring (case insensitive)
+template<typename T>
+int ci_find_substr( const T& str1, const T& str2, const std::locale& loc)
+{
+    typename T::const_iterator it = std::search( str1.begin(), str1.end(),
+                                                 str2.begin(), str2.end(), my_equal<typename T::value_type>(loc) );
+    if ( it != str1.end() ) return it - str1.begin();
+    else return -1; // not found
+}
+
+int contains(const std::string &first, const std::string &second){
+    return ci_find_substr(first, second, std::locale());
+}
+
 void FilmeMenu::render() {
     bool& open = FilmeMenu::open;
 
-    ImGui::SetNextWindowSize(ImVec2(700,500),0);
+    ImGui::SetNextWindowSize(ImVec2(600,500),0);
 
     ImGui::Begin("Filmes", &open);
 
-
+    refreshBuffers();
 
     if(ImGui::CollapsingHeader("Cadastrar e Editar Filme")) {
 
         ImGui::Text("Nome:");
 
-        std::copy(FilmeMenu::atual.nome.begin(),FilmeMenu::atual.nome.end(), nomeBuffer.begin());
-        std::copy(FilmeMenu::atual.anoLancamento.begin(),FilmeMenu::atual.anoLancamento.end(), anoBuffer.begin());
-        std::copy(FilmeMenu::atual.genero.begin(),FilmeMenu::atual.genero.end(), generoBuffer.begin());
 
         if(ImGui::InputText("Nome", &nomeBuffer[0], nomeBuffer.size())){
             FilmeMenu::atual.nome = &nomeBuffer[0];
@@ -102,7 +137,6 @@ void FilmeMenu::render() {
     ImGui::InputText("Pesquisar", buffer.get(), 512);
 
     {
-
         std::string filter = buffer.get();
 
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
@@ -121,17 +155,18 @@ void FilmeMenu::render() {
         ImGui::Columns(7);
         std::vector<Filme> filtered(FilmeMenu::filmes.capacity());
 
-        std::copy_if(FilmeMenu::filmes.begin(), FilmeMenu::filmes.end(), filtered.begin(), [filter](Filme filme){
-            return filter.empty() ? true :
-            filter.find(std::to_string(filme.valor)) ? true :
-            filter.find(filme.genero) ? true :
-            filter.find(filme.nome) ? true :
-            filter.find(filme.sinopse) ? true :
-            filter.find(filme.anoLancamento) != 0;
-
+        std::copy_if(FilmeMenu::filmes.begin(), FilmeMenu::filmes.end(), filtered.begin(), [filter](Filme filme) {
+            return filter.empty()                                      ? true :
+                   contains(filter, std::to_string(filme.valor)) != -1 ? true :
+                   contains(filter, filme.genero               ) != -1 ? true :
+                   contains(filter, filme.nome                 ) != -1 ? true :
+                   contains(filter, filme.sinopse              ) != -1 ? true :
+                   contains(filter, filme.anoLancamento        ) != -1;
         });
 
         for(auto filme: filtered){
+            ImGui::PushID(filme.id);
+
             ImGui::Text(filme.nome.c_str());
 
             ImGui::NextColumn();
@@ -163,9 +198,16 @@ void FilmeMenu::render() {
                 dbInstance->getStorage().remove<Filme>(filme.id);
 
                 updateFilmes();
+
+                if(FilmeMenu::editando)
+                    FilmeMenu::editando = false;
+
+                clearFilme();
             }
 
             ImGui::NextColumn();
+
+            ImGui::PopID();
         }
 
         ImGui::EndChild();

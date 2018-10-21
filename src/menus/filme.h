@@ -19,6 +19,7 @@ private:
     void updateFilmes();
     void clearFilme();
     void editMenu(Filme filme);
+    void refreshBuffers();
 public:
 
     FilmeMenu();
