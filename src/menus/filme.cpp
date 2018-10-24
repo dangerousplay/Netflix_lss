@@ -1,5 +1,7 @@
 #include <utility>
 
+#include <utility>
+
 //
 // Created by aluno on 17/10/18.
 //
@@ -18,6 +20,8 @@ std::vector<char> nomeBuffer(BUFFER_SIZE);
 
 std::shared_ptr<char> buffer(new char[512]);
 
+std::vector<std::string> messageFields;
+
 FilmeMenu::FilmeMenu() {
     FilmeMenu::filmes = dbInstance->getStorage().get_all<Filme>();
 }
@@ -25,16 +29,6 @@ FilmeMenu::FilmeMenu() {
 std::vector<Filme> FilmeMenu::getFilmes() {
     return FilmeMenu::filmes;
 }
-
-/*if (ImGui::BeginPopupContextItem("item context menu"))
-            {
-                if (ImGui::Selectable("Set to zero")) value = 0.0f;
-                if (ImGui::Selectable("Set to PI")) value = 3.1415f;
-                ImGui::PushItemWidth(-1);
-                ImGui::DragFloat("##Value", &value, 0.1f, 0.0f, 0.0f);
-                ImGui::PopItemWidth();
-                ImGui::EndPopup();
-            }*/
 
 void FilmeMenu::refreshBuffers(){
     std::copy(FilmeMenu::atual.nome.begin(),FilmeMenu::atual.nome.end(), nomeBuffer.begin());
@@ -48,8 +42,53 @@ void FilmeMenu::refreshBuffers(){
     std::fill(sinopseBuffer.begin() + FilmeMenu::atual.sinopse.size(), sinopseBuffer.end(), '\0');
 }
 
-int contains(const std::string &first, const std::string &second){
-    return ci_find_substr(first, second, std::locale());
+void removeDuplicates(std::string &b){
+    messageFields.erase(std::remove_if(messageFields.begin(), messageFields.end(), [b](std::string a){
+        return a == b;
+    }), messageFields.end());
+}
+
+bool validateFields(){
+    std::string message;
+
+    message = "O campo nome não pode ser vazio";
+    removeDuplicates(message);
+
+    if(std::string(&nomeBuffer[0]).empty()){
+        messageFields.push_back(message);
+        return false;
+    }
+
+    message = "O campo ano não pode ser vazio";
+    removeDuplicates(message);
+
+    if(std::string(&anoBuffer[0]).empty()){
+        messageFields.push_back(message);
+        return false;
+    }
+
+    message = "O campo genero não pode ser vazio";
+    removeDuplicates(message);
+
+    if(std::string(&generoBuffer[0]).empty()){
+        messageFields.push_back(message);
+        return false;
+    }
+
+    message = "O campo sinopse não pode ser vazio";
+    removeDuplicates(message);
+
+    if(std::string(&sinopseBuffer[0]).empty()){
+        messageFields.push_back(message);
+        return false;
+    }
+
+
+    return true;
+}
+
+bool contains(std::string first, const std::string &second){
+    return findByRegex(std::move(first), second);
 }
 
 void FilmeMenu::render() {
@@ -91,20 +130,28 @@ void FilmeMenu::render() {
         ImGui::Text("Valor:");
         ImGui::InputDouble("Valor", &FilmeMenu::atual.valor);
 
+        for(const auto &str : messageFields){
+            ImGui::Text(str.c_str());
+        }
+
         if(editando){
             if(ImGui::Button("Editar Filme")){
-                FilmeMenu::editando = false;
-                dbInstance->getStorage().update<Filme>(FilmeMenu::atual);
-                updateFilmes();
+                if(validateFields()) {
+                    FilmeMenu::editando = false;
+                    dbInstance->getStorage().update<Filme>(FilmeMenu::atual);
+                    updateFilmes();
 
-                clearFilme();
+                    clearFilme();
+                }
             }
         } else {
             if(ImGui::Button("Salvar Filme")){
-                dbInstance->getStorage().insert<Filme>(FilmeMenu::atual);
-                updateFilmes();
+                if(validateFields()){
+                    dbInstance->getStorage().insert<Filme>(FilmeMenu::atual);
+                    updateFilmes();
 
-                clearFilme();
+                    clearFilme();
+                }
             }
         }
     }
@@ -136,11 +183,11 @@ void FilmeMenu::render() {
 
         std::copy_if(FilmeMenu::filmes.begin(), FilmeMenu::filmes.end(), filtered.begin(), [filter](Filme filme) {
             return filter.empty()                                      ? true :
-                   contains(filter, std::to_string(filme.valor)) != -1 ? true :
-                   contains(filter, filme.genero               ) != -1 ? true :
-                   contains(filter, filme.nome                 ) != -1 ? true :
-                   contains(filter, filme.sinopse              ) != -1 ? true :
-                   contains(filter, filme.anoLancamento        ) != -1;
+                   contains(filter, std::to_string(filme.valor))  ? true :
+                   contains(filter, filme.genero               )  ? true :
+                   contains(filter, filme.nome                 )  ? true :
+                   contains(filter, filme.sinopse              )  ? true :
+                   contains(filter, filme.anoLancamento        );
         });
 
         for(auto filme: filtered){
