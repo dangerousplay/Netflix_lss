@@ -30,6 +30,6 @@ add_executable(${PROJECT_NAME}
         src/menus/cliente.h
         src/menus/alocacao.cpp
         src/menus/alocacao.h
-        src/utils/stringUtils.h)
+        src/utils/stringUtils.h src/db/init.cpp src/utils/stringUtils.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS})

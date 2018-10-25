@@ -12,11 +12,12 @@
 
 class Cliente {
 public:
-    int id = 0;
+    int id = -1;
     std::string nome = "";
     std::string endereco = "";
+    std::string cpf = "";
 
-    Cliente(int id, const std::string &nome, const std::string &endereco, double divida);
+    Cliente(int id, const std::string &nome, const std::string &endereco, const std::string &cpf, double divida);
 
     double divida = 0;
 
@@ -26,6 +27,9 @@ public:
 
     std::string toJson();
 
+    bool operator==(const Cliente &rhs) const;
+
+    bool operator!=(const Cliente &rhs) const;
 };
 
 #endif //NETFLIX_LSS_CLIENTE_H

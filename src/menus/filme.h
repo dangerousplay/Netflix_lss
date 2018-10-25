@@ -20,6 +20,10 @@ private:
     void clearFilme();
     void editMenu(Filme filme);
     void refreshBuffers();
+    void removeDuplicates(std::string &b);
+    bool validateFields();
+    static bool contains(std::string first, const std::string &second);
+
 public:
 
     FilmeMenu();

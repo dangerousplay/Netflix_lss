@@ -7,6 +7,9 @@
 #include "../models/Filme.h"
 #include "../models/Alocacao.h"
 
+#ifndef SERVICO_LOCADORA
+#define SERVICO_LOCADORA
+
 class ServicoLocadora {
 private:
   ServicoLocadora();
@@ -20,6 +23,8 @@ public:
 
   std::vector<Alocacao> allocacoesEmAtraso();
 
-  std::vector<Alocacao> allocacoesEmAtraso(Cliente cliente);
+  std::vector<Alocacao> allocacoesEmAtrasoByCliente(Cliente cliente);
 
 };
+
+#endif

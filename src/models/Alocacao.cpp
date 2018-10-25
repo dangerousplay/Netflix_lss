@@ -34,3 +34,15 @@ Alocacao Alocacao::fromJson(std::string json) {
 
     return Alocacao(j["id"], j["clienteId"], j["dataInicial"], j["dataFinal"], j["filmes"], j["valor"]);
 }
+
+bool Alocacao::operator==(const Alocacao &rhs) const {
+    return clienteId == rhs.clienteId &&
+           dataInicial == rhs.dataInicial &&
+           dataFinal == rhs.dataFinal &&
+           filmes == rhs.filmes &&
+           valor == rhs.valor;
+}
+
+bool Alocacao::operator!=(const Alocacao &rhs) const {
+    return !(rhs == *this);
+}

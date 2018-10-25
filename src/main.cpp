@@ -30,6 +30,7 @@ int main() {
 #include "imgui/imgui_impl_opengl3.h"
 #include "menus/IMenu.h"
 #include "menus/filme.h"
+#include "menus/cliente.h"
 #include <stdio.h>
 
 // About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually.
@@ -114,9 +115,11 @@ int main(int, char**)
     bool show_demo_window = true;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    auto filmeMenu = std::make_shared<FilmeMenu>();
 
-    std::vector<std::shared_ptr<IMenu>> menus = { filmeMenu };
+    auto filmeMenu = std::make_shared<FilmeMenu>();
+    auto clienteMenu = std::make_shared<ClienteMenu>();
+
+    std::vector<std::shared_ptr<IMenu>> menus = { filmeMenu, clienteMenu };
 
     // Main loop
     while (!glfwWindowShouldClose(window))

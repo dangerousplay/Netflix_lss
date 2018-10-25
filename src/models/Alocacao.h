@@ -13,12 +13,12 @@
 
 class Alocacao {
 public:
-  int id;
-  int clienteId;
-  std::string dataInicial;
-  std::string dataFinal;
-  std::string filmes;
-  double valor;
+  int id = -1;
+  int clienteId = -1;
+  std::string dataInicial = "";
+  std::string dataFinal = "";
+  std::string filmes = "";
+  double valor = 0;
 
   Alocacao(int id, int clienteId, const std::string &dataInicial, const std::string &dataFinal,
              const std::string &filmes, double valor);
@@ -28,6 +28,10 @@ public:
   static Alocacao fromJson(std::string json);
 
   std::string toJson();
+
+    bool operator==(const Alocacao &rhs) const;
+
+    bool operator!=(const Alocacao &rhs) const;
 };
 
 

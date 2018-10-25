@@ -39,3 +39,15 @@ Filme::Filme() {
     Filme::valor = 0;
 }
 
+bool Filme::operator==(const Filme &rhs) const {
+    return nome == rhs.nome &&
+           valor == rhs.valor &&
+           anoLancamento == rhs.anoLancamento &&
+           sinopse == rhs.sinopse &&
+           genero == rhs.genero;
+}
+
+bool Filme::operator!=(const Filme &rhs) const {
+    return !(rhs == *this);
+}
+

@@ -11,12 +11,16 @@
 
 class Filme {
 public:
-    int id;
-    std::string nome;
-    double valor;
-    std::string anoLancamento;
-    std::string sinopse;
-    std::string genero;
+    int id = -1;
+    std::string nome = "";
+    double valor = 0;
+    std::string anoLancamento = "";
+    std::string sinopse = "";
+    std::string genero = "";
+
+    bool operator==(const Filme &rhs) const;
+
+    bool operator!=(const Filme &rhs) const;
 
     Filme();
 

@@ -16,11 +16,11 @@
 std::vector<char> generoBuffer(BUFFER_SIZE);
 std::vector<char> sinopseBuffer(BUFFER_SIZE);
 std::vector<char> anoBuffer(BUFFER_SIZE);
-std::vector<char> nomeBuffer(BUFFER_SIZE);
+std::vector<char> nomeBufferF(BUFFER_SIZE);
 
-std::shared_ptr<char> buffer(new char[512]);
+std::shared_ptr<char> bufferPesquisaF((char*)calloc(512,sizeof(char)));
 
-std::vector<std::string> messageFields;
+std::vector<std::string> messageFieldsF;
 
 FilmeMenu::FilmeMenu() {
     FilmeMenu::filmes = dbInstance->getStorage().get_all<Filme>();
@@ -31,31 +31,31 @@ std::vector<Filme> FilmeMenu::getFilmes() {
 }
 
 void FilmeMenu::refreshBuffers(){
-    std::copy(FilmeMenu::atual.nome.begin(),FilmeMenu::atual.nome.end(), nomeBuffer.begin());
+    std::copy(FilmeMenu::atual.nome.begin(),FilmeMenu::atual.nome.end(), nomeBufferF.begin());
     std::copy(FilmeMenu::atual.anoLancamento.begin(),FilmeMenu::atual.anoLancamento.end(), anoBuffer.begin());
     std::copy(FilmeMenu::atual.genero.begin(),FilmeMenu::atual.genero.end(), generoBuffer.begin());
     std::copy(FilmeMenu::atual.sinopse.begin(),FilmeMenu::atual.sinopse.end(), sinopseBuffer.begin());
 
-    std::fill(nomeBuffer.begin() + FilmeMenu::atual.nome.size(), nomeBuffer.end(), '\0');
+    std::fill(nomeBufferF.begin() + FilmeMenu::atual.nome.size(), nomeBufferF.end(), '\0');
     std::fill(anoBuffer.begin() + FilmeMenu::atual.anoLancamento.size(), anoBuffer.end(), '\0');
     std::fill(generoBuffer.begin() + FilmeMenu::atual.genero.size(), generoBuffer.end(), '\0');
     std::fill(sinopseBuffer.begin() + FilmeMenu::atual.sinopse.size(), sinopseBuffer.end(), '\0');
 }
 
-void removeDuplicates(std::string &b){
-    messageFields.erase(std::remove_if(messageFields.begin(), messageFields.end(), [b](std::string a){
+void FilmeMenu::removeDuplicates(std::string &b){
+    messageFieldsF.erase(std::remove_if(messageFieldsF.begin(), messageFieldsF.end(), [b](std::string a){
         return a == b;
-    }), messageFields.end());
+    }), messageFieldsF.end());
 }
 
-bool validateFields(){
+bool FilmeMenu::validateFields() {
     std::string message;
 
     message = "O campo nome não pode ser vazio";
-    removeDuplicates(message);
+    FilmeMenu::removeDuplicates(message);
 
-    if(std::string(&nomeBuffer[0]).empty()){
-        messageFields.push_back(message);
+    if(std::string(&nomeBufferF[0]).empty()){
+        messageFieldsF.push_back(message);
         return false;
     }
 
@@ -63,7 +63,7 @@ bool validateFields(){
     removeDuplicates(message);
 
     if(std::string(&anoBuffer[0]).empty()){
-        messageFields.push_back(message);
+        messageFieldsF.push_back(message);
         return false;
     }
 
@@ -71,7 +71,7 @@ bool validateFields(){
     removeDuplicates(message);
 
     if(std::string(&generoBuffer[0]).empty()){
-        messageFields.push_back(message);
+        messageFieldsF.push_back(message);
         return false;
     }
 
@@ -79,7 +79,7 @@ bool validateFields(){
     removeDuplicates(message);
 
     if(std::string(&sinopseBuffer[0]).empty()){
-        messageFields.push_back(message);
+        messageFieldsF.push_back(message);
         return false;
     }
 
@@ -87,7 +87,7 @@ bool validateFields(){
     return true;
 }
 
-bool contains(std::string first, const std::string &second){
+bool FilmeMenu::contains(std::string first, const std::string &second){
     return findByRegex(std::move(first), second);
 }
 
@@ -105,8 +105,8 @@ void FilmeMenu::render() {
         ImGui::Text("Nome:");
 
 
-        if(ImGui::InputText("Nome", &nomeBuffer[0], nomeBuffer.size())){
-            FilmeMenu::atual.nome = &nomeBuffer[0];
+        if(ImGui::InputText("Nome", &nomeBufferF[0], nomeBufferF.size())){
+            FilmeMenu::atual.nome = &nomeBufferF[0];
         }
 
         ImGui::Text("Ano:");
@@ -130,7 +130,7 @@ void FilmeMenu::render() {
         ImGui::Text("Valor:");
         ImGui::InputDouble("Valor", &FilmeMenu::atual.valor);
 
-        for(const auto &str : messageFields){
+        for(const auto &str : messageFieldsF){
             ImGui::Text(str.c_str());
         }
 
@@ -160,10 +160,10 @@ void FilmeMenu::render() {
     ImGui::Separator();
 
     ImGui::Text("Pesquisar: ");
-    ImGui::InputText("Pesquisar", buffer.get(), 512);
+    ImGui::InputText("Pesquisar", bufferPesquisaF.get(), 512);
 
     {
-        std::string filter = buffer.get();
+        std::string filter = bufferPesquisaF.get();
 
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
         ImGui::BeginChild("Child2", ImVec2(0,300));
@@ -180,8 +180,9 @@ void FilmeMenu::render() {
 
         ImGui::Columns(7);
         std::vector<Filme> filtered(FilmeMenu::filmes.capacity());
+        auto contains = &FilmeMenu::contains;
 
-        std::copy_if(FilmeMenu::filmes.begin(), FilmeMenu::filmes.end(), filtered.begin(), [filter](Filme filme) {
+        std::copy_if(FilmeMenu::filmes.begin(), FilmeMenu::filmes.end(), filtered.begin(), [filter, contains](Filme filme) {
             return filter.empty()                                      ? true :
                    contains(filter, std::to_string(filme.valor))  ? true :
                    contains(filter, filme.genero               )  ? true :

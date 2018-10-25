@@ -22,7 +22,7 @@ bool ServicoLocadora::pagarDivida(Cliente cliente, double valor) {
   return false;
 }
 
-std::vector<Alocacao> ServicoLocadora::allocacoesEmAtraso(Cliente cliente) {
+std::vector<Alocacao> ServicoLocadora::allocacoesEmAtrasoByCliente(Cliente cliente) {
   return std::vector<Alocacao>();
 }
 
