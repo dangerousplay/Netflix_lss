@@ -11,7 +11,15 @@ using Json = nlohmann::json;
 
 Alocacao::Alocacao(int id, int clienteId, const std::string &dataInicial, const std::string &dataFinal,
                    const std::string &filmes, double valor) : id(id), clienteId(clienteId), dataInicial(dataInicial),
-                                                              dataFinal(dataFinal), filmes(filmes), valor(valor) {}
+                                                              dataFinal(dataFinal), filmes(filmes), valor(valor) {
+    Json j = Json::parse(filmes);
+
+    std::transform(j.begin(), j.end(), filmesVector.begin(), [](Json j) -> Filme {
+        return Filme::fromJson(j.dump());
+    });
+
+    Alocacao::periodoAlocacao = boost::gregorian::date_period(boost::gregorian::date_from_iso_string(dataInicial), boost::gregorian::date_from_iso_string(dataFinal));
+}
 
 Alocacao::Alocacao() {}
 
@@ -45,4 +53,12 @@ bool Alocacao::operator==(const Alocacao &rhs) const {
 
 bool Alocacao::operator!=(const Alocacao &rhs) const {
     return !(rhs == *this);
+}
+
+void Alocacao::setDataInicial(boost::gregorian::date data) {
+    Alocacao::dataInicial = boost::gregorian::to_iso_extended_string(data);
+}
+
+void Alocacao::setDataFinal(boost::gregorian::date data) {
+    Alocacao::dataFinal = boost::gregorian::to_iso_extended_string(data);
 }

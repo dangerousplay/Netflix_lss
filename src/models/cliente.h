@@ -17,9 +17,7 @@ public:
     std::string endereco = "";
     std::string cpf = "";
 
-    Cliente(int id, const std::string &nome, const std::string &endereco, const std::string &cpf, double divida);
-
-    double divida = 0;
+    Cliente(int id, const std::string &nome, const std::string &endereco, const std::string &cpf);
 
     Cliente();
 

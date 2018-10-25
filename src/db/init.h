@@ -17,17 +17,17 @@ using namespace sqlite_orm;
 
 class Database {
 private:
-  internal::storage_t<table_t<internal::column_t<Cliente, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, double>>, table_t<internal::column_t<Filme, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, double>, internal::column_t<Filme, std::string>>, table_t<internal::column_t<Alocacao, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Alocacao, int>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, double>>> storage = initDatabase("db.sqlite");
 
-  static internal::storage_t<table_t<internal::column_t<Cliente, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, double>>, table_t<internal::column_t<Filme, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, double>, internal::column_t<Filme, std::string>>, table_t<internal::column_t<Alocacao, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Alocacao, int>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, double>>>
+
+  static internal::storage_t<table_t<internal::column_t<Cliente, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>>, table_t<internal::column_t<Filme, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, double>, internal::column_t<Filme, std::string>>, table_t<internal::column_t<Alocacao, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Alocacao, int>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, double>>>
   initDatabase(std::string filename) {
     auto storage = make_storage(filename,
                                 make_table("clientes",
                                            make_column("id", &Cliente::id, autoincrement(), primary_key()),
                                            make_column("nome", &Cliente::nome),
                                            make_column("endereco", &Cliente::endereco),
-                                           make_column("cpf", &Cliente::cpf),
-                                           make_column("divida", &Cliente::divida)),
+                                           make_column("cpf", &Cliente::cpf)
+                                ),
 
                                 make_table("filmes",
                                            make_column("id", &Filme::id, autoincrement(), primary_key()),
@@ -52,9 +52,11 @@ private:
 
     return storage;
   }
+
+    decltype(initDatabase("")) storage = initDatabase("db.sqlite");
 public:
 
-  internal::storage_t<table_t<internal::column_t<Cliente, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, double>>, table_t<internal::column_t<Filme, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, double>, internal::column_t<Filme, std::string>>, table_t<internal::column_t<Alocacao, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Alocacao, int>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, double>>>
+  decltype(storage)
   getStorage() const {
     return storage;
   }

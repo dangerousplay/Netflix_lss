@@ -161,7 +161,6 @@ void ClienteMenu::render() {
 
         std::copy_if(ClienteMenu::clientes.begin(), ClienteMenu::clientes.end(), filtered.begin(), [filter,cliente](Cliente cliente) {
             return filter.empty()                                      ? true :
-                   contains(filter, std::to_string(cliente.divida))    ? true :
                    contains(filter, cliente.endereco              )    ? true :
                    contains(filter, cliente.nome                  )    ? true :
                    contains(filter, cliente.cpf                   );

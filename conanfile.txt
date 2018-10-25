@@ -1,6 +1,7 @@
 [requires]
  sqlite_orm/1.1@bincrafters/stable
  sqlite3/3.21@bincrafters/stable
+ boost/1.68.0@conan/stable
  jsonformoderncpp/3.3.0@vthiery/stable
  glad/0.1.24@bincrafters/stable
  imgui/1.62@bincrafters/stable
