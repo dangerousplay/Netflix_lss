@@ -25,3 +25,7 @@ bool findByRegex(std::string regex, std::string toSearch){
     return std::regex_search(toSearch, self_regex);
 }
 
+bool contains(std::string first, const std::string &second){
+    return findByRegex(std::move(first), second);
+}
+

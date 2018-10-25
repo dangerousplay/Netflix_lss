@@ -9,16 +9,6 @@
 #include "../db/init.h"
 #include "../utils/stringUtils.h"
 
-#define BUFFER_SIZE 100
-
-std::vector<char> enderecoBuffer(BUFFER_SIZE);
-std::vector<char> cpfBuffer(BUFFER_SIZE);
-std::vector<char> nomeBuffer(BUFFER_SIZE);
-
-std::shared_ptr<char> bufferPesquisa((char*)calloc(512,sizeof(char)));
-
-std::vector<std::string> messageFields;
-
 const std::vector<Cliente> &ClienteMenu::getClientes() const {
     return clientes;
 }
@@ -44,7 +34,7 @@ void ClienteMenu::refreshBuffers(){
     std::fill(enderecoBuffer.begin() + ClienteMenu::atual.endereco.size(), enderecoBuffer.end(), '\0');
 }
 
-void removeDuplicates(std::string &b){
+void ClienteMenu::removeDuplicates(std::string &b){
     messageFields.erase(std::remove_if(messageFields.begin(), messageFields.end(), [b](std::string a){
         return a == b;
     }), messageFields.end());
@@ -55,7 +45,7 @@ ClienteMenu::ClienteMenu() {
     updateClientes();
 }
 
-bool validateFields() {
+bool ClienteMenu::validateFields() {
     std::string message;
 
     message = "O campo nome não pode ser vazio";
@@ -85,9 +75,7 @@ bool validateFields() {
     return true;
 }
 
-bool contains(std::string first, const std::string &second){
-    return findByRegex(std::move(first), second);
-}
+
 
 
 void ClienteMenu::render() {

@@ -11,17 +11,6 @@
 #include "../db/init.h"
 #include "../utils/stringUtils.h"
 
-#define BUFFER_SIZE 100
-
-std::vector<char> generoBuffer(BUFFER_SIZE);
-std::vector<char> sinopseBuffer(BUFFER_SIZE);
-std::vector<char> anoBuffer(BUFFER_SIZE);
-std::vector<char> nomeBufferF(BUFFER_SIZE);
-
-std::shared_ptr<char> bufferPesquisaF((char*)calloc(512,sizeof(char)));
-
-std::vector<std::string> messageFieldsF;
-
 FilmeMenu::FilmeMenu() {
     FilmeMenu::filmes = dbInstance->getStorage().get_all<Filme>();
 }
@@ -85,10 +74,6 @@ bool FilmeMenu::validateFields() {
 
 
     return true;
-}
-
-bool FilmeMenu::contains(std::string first, const std::string &second){
-    return findByRegex(std::move(first), second);
 }
 
 void FilmeMenu::render() {
@@ -180,9 +165,8 @@ void FilmeMenu::render() {
 
         ImGui::Columns(7);
         std::vector<Filme> filtered(FilmeMenu::filmes.capacity());
-        auto contains = &FilmeMenu::contains;
 
-        std::copy_if(FilmeMenu::filmes.begin(), FilmeMenu::filmes.end(), filtered.begin(), [filter, contains](Filme filme) {
+        std::copy_if(FilmeMenu::filmes.begin(), FilmeMenu::filmes.end(), filtered.begin(), [filter](Filme filme) {
             return filter.empty()                                      ? true :
                    contains(filter, std::to_string(filme.valor))  ? true :
                    contains(filter, filme.genero               )  ? true :

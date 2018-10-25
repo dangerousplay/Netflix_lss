@@ -13,4 +13,6 @@ size_t findCaseInsensitive(std::string data, std::string toSearch, size_t pos = 
 
 bool findByRegex(std::string regex, std::string toSearch);
 
+bool contains(std::string first, const std::string &second);
+
 #endif //NETFLIX_LSS_STRINGUTILS_H;
