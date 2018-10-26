@@ -62,3 +62,13 @@ void Alocacao::setDataInicial(boost::gregorian::date data) {
 void Alocacao::setDataFinal(boost::gregorian::date data) {
     Alocacao::dataFinal = boost::gregorian::to_iso_extended_string(data);
 }
+
+void Alocacao::setFilmes(const std::vector<Filme> &filmes) {
+    Json j;
+
+    std::transform(filmes.begin(), filmes.end(), j.begin(), [](Filme f) -> Json {
+        return f.toJsonStruct();
+    });
+
+    Alocacao::filmes = j.dump();
+}

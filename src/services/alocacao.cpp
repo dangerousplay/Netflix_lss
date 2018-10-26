@@ -3,11 +3,12 @@
 //
 
 #include "alocacao.h"
+#include "../db/init.h"
+
+ServicoLocadora servicoLocadora = ServicoLocadora();
 
 std::shared_ptr<Alocacao> ServicoLocadora::alocarFilmes(Cliente cliente, std::vector<Filme> filmes) {
-  return {
-
-  };
+  //dbInstance->getStorage().select()
 }
 
 bool ServicoLocadora::quitarDivida(Cliente cliente) {

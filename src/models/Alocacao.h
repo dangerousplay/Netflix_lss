@@ -12,6 +12,7 @@
 #include "cliente.h"
 #include "boost/date_time/gregorian/gregorian.hpp"
 
+
 class Alocacao {
 public:
   int id = -1;
@@ -39,6 +40,8 @@ public:
   void setDataInicial(boost::gregorian::date data);
 
   void setDataFinal(boost::gregorian::date data);
+
+  void setFilmes(const std::vector<Filme> &filmes);
 
   bool operator==(const Alocacao &rhs) const;
 

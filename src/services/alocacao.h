@@ -11,10 +11,9 @@
 #define SERVICO_LOCADORA
 
 class ServicoLocadora {
-private:
+public:
   ServicoLocadora();
 
-public:
   std::shared_ptr<Alocacao> alocarFilmes(Cliente cliente, std::vector<Filme> filmes);
 
   bool pagarDivida(Cliente cliente, double valor);
@@ -26,5 +25,7 @@ public:
   std::vector<Alocacao> allocacoesEmAtrasoByCliente(Cliente cliente);
 
 };
+
+extern ServicoLocadora servicoLocadora;
 
 #endif

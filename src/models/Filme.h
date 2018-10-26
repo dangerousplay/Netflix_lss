@@ -7,6 +7,9 @@
 
 
 #include <string>
+#include <nlohmann/json.hpp>
+
+using Json = nlohmann::json;
 
 
 class Filme {
@@ -28,6 +31,9 @@ public:
           const std::string &genero);
 
     std::string toJson();
+
+    Json toJsonStruct();
+
     static Filme fromJson(std::string json);
 };
 

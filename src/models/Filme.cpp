@@ -15,6 +15,10 @@ Filme Filme::fromJson(std::string json) {
 }
 
 std::string Filme::toJson() {
+    return toJsonStruct().dump();
+}
+
+Json Filme::toJsonStruct() {
     Json j = {
             {"id",Filme::id},
             {"nome", Filme::nome},
@@ -24,7 +28,7 @@ std::string Filme::toJson() {
             {"genero", Filme::genero}
     };
 
-    return j.dump();
+    return j;
 }
 
 Filme::Filme(int id, const std::string &nome, double valor, const std::string &anoLancamento,
