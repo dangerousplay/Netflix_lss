@@ -3,25 +3,30 @@
 //
 
 #include "Alocacao.h"
+#include "../db/init.h"
 
 #include <nlohmann/json.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include "../utils/unixTime.h"
 
 using Json = nlohmann::json;
 
+Alocacao::Alocacao(int id, int clienteId, int filmeId, const boost::gregorian::date_period periodo,
+                   double valor) : id(id), clienteId(&clienteId), filmeId(&filmeId), valor(valor) {
 
-Alocacao::Alocacao(int id, int clienteId, const std::string &dataInicial, const std::string &dataFinal,
-                   const std::string &filmes, double valor) : id(id), clienteId(clienteId), dataInicial(dataInicial),
-                                                              dataFinal(dataFinal), filmes(filmes), valor(valor) {
-    Json j = Json::parse(filmes);
+    Alocacao::dataInicial = toMillisecondsEpoch(periodo.begin());
+    Alocacao::dataFinal = toMillisecondsEpoch(periodo.end());
 
-    std::transform(j.begin(), j.end(), filmesVector.begin(), [](Json j) -> Filme {
-        return Filme::fromJson(j.dump());
-    });
-
-    Alocacao::periodoAlocacao = boost::gregorian::date_period(boost::gregorian::date_from_iso_string(dataInicial), boost::gregorian::date_from_iso_string(dataFinal));
+    Alocacao::periodoAlocacao = periodo;
 }
 
 Alocacao::Alocacao() {}
+
+Alocacao::Alocacao(int id, int clienteId, int filmeId, long dataInicial, long dataFinal, double valor, bool paga) : id(
+        id), clienteId(&clienteId), filmeId(&filmeId), dataInicial(dataInicial), dataFinal(dataFinal), valor(valor),
+                                                                                                                    paga(paga) {
+    Alocacao::periodoAlocacao = boost::gregorian::date_period(to_bdate(dataInicial),to_bdate(dataFinal));
+}
 
 std::string Alocacao::toJson() {
     Json j = {
@@ -29,7 +34,7 @@ std::string Alocacao::toJson() {
             {"clienteId", Alocacao::clienteId},
             {"dataInicial", Alocacao::dataInicial},
             {"dataFinal", Alocacao::dataFinal},
-            {"filmes", Alocacao::filmes},
+            {"filmeId", Alocacao::filmeId},
             {"valor", Alocacao::valor}
     };
 
@@ -40,14 +45,14 @@ std::string Alocacao::toJson() {
 Alocacao Alocacao::fromJson(std::string json) {
     Json j = Json::parse(json);
 
-    return Alocacao(j["id"], j["clienteId"], j["dataInicial"], j["dataFinal"], j["filmes"], j["valor"]);
+    return Alocacao(j["id"], j["clienteId"], j["filmeId"], j["dataInicial"], j["dataFinal"], j["valor"], j["paga"]);
 }
 
 bool Alocacao::operator==(const Alocacao &rhs) const {
     return clienteId == rhs.clienteId &&
            dataInicial == rhs.dataInicial &&
            dataFinal == rhs.dataFinal &&
-           filmes == rhs.filmes &&
+           filmeId == rhs.filmeId &&
            valor == rhs.valor;
 }
 
@@ -56,19 +61,17 @@ bool Alocacao::operator!=(const Alocacao &rhs) const {
 }
 
 void Alocacao::setDataInicial(boost::gregorian::date data) {
-    Alocacao::dataInicial = boost::gregorian::to_iso_extended_string(data);
+    Alocacao::dataInicial = toMillisecondsEpoch(data);
 }
 
 void Alocacao::setDataFinal(boost::gregorian::date data) {
-    Alocacao::dataFinal = boost::gregorian::to_iso_extended_string(data);
+    Alocacao::dataFinal = toMillisecondsEpoch(data);
 }
 
-void Alocacao::setFilmes(const std::vector<Filme> &filmes) {
-    Json j;
-
-    std::transform(filmes.begin(), filmes.end(), j.begin(), [](Filme f) -> Json {
-        return f.toJsonStruct();
-    });
-
-    Alocacao::filmes = j.dump();
+void Alocacao::setPeriodo(boost::gregorian::date_period periodo) {
+    Alocacao::setDataInicial(periodo.begin());
+    Alocacao::setDataFinal(periodo.end());
 }
+
+
+

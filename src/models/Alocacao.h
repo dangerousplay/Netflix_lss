@@ -16,20 +16,23 @@
 class Alocacao {
 public:
   int id = -1;
-  int clienteId = -1;
+  std::shared_ptr<int> clienteId;
+  std::shared_ptr<int> filmeId;
 
-  std::string dataInicial = "";
-  std::string dataFinal = "";
-
-  std::string filmes = "";
-  std::vector<Filme> filmesVector;
+  long dataInicial = 0;
+  long dataFinal = 0;
 
   boost::gregorian::date_period periodoAlocacao = boost::gregorian::date_period(boost::gregorian::date(),boost::gregorian::date());
 
   double valor = 0;
 
-  Alocacao(int id, int clienteId, const std::string &dataInicial, const std::string &dataFinal,
-             const std::string &filmes, double valor);
+  bool paga = false;
+
+  Alocacao(int id, int clienteId, int filmeId, boost::gregorian::date_period periodo,
+           double valor);
+
+  Alocacao(int id, int clienteId, int filmeId, long dataInicial, long dataFinal, double valor, bool paga);
+
 
   Alocacao();
 
@@ -41,7 +44,7 @@ public:
 
   void setDataFinal(boost::gregorian::date data);
 
-  void setFilmes(const std::vector<Filme> &filmes);
+  void setPeriodo(boost::gregorian::date_period periodo);
 
   bool operator==(const Alocacao &rhs) const;
 

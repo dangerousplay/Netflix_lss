@@ -18,8 +18,7 @@ using namespace sqlite_orm;
 class Database {
 private:
 
-
-  static internal::storage_t<table_t<internal::column_t<Cliente, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>>, table_t<internal::column_t<Filme, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, double>, internal::column_t<Filme, std::string>>, table_t<internal::column_t<Alocacao, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Alocacao, int>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, std::string>, internal::column_t<Alocacao, double>>>
+  static internal::storage_t<table_t<internal::column_t<Cliente, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>>, table_t<internal::column_t<Filme, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, double>, internal::column_t<Filme, std::string>>, table_t<internal::column_t<Alocacao, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Alocacao, std::shared_ptr<int>>, internal::column_t<Alocacao, long>, internal::column_t<Alocacao, long>, internal::column_t<Alocacao, std::shared_ptr<int>>, internal::column_t<Alocacao, double>, internal::column_t<Alocacao, bool>, constraints::foreign_key_t<std::shared_ptr<int> Alocacao::*, int Filme::*>, constraints::foreign_key_t<std::shared_ptr<int> Alocacao::*, int Cliente::*>>>
   initDatabase(std::string filename) {
     auto storage = make_storage(filename,
                                 make_table("clientes",
@@ -43,8 +42,12 @@ private:
                                            make_column("cliente_id", &Alocacao::clienteId),
                                            make_column("data_inicial", &Alocacao::dataInicial),
                                            make_column("data_final", &Alocacao::dataFinal),
-                                           make_column("filmes", &Alocacao::filmes),
-                                           make_column("valor", &Alocacao::valor)
+                                           make_column("filmeId", &Alocacao::filmeId),
+                                           make_column("valor", &Alocacao::valor),
+                                           make_column("paga", &Alocacao::paga),
+
+                                           foreign_key(&Alocacao::filmeId).references(&Filme::id),
+                                           foreign_key(&Alocacao::clienteId).references(&Cliente::id)
                                 )
     );
 

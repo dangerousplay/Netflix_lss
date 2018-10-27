@@ -10,13 +10,15 @@
 #ifndef SERVICO_LOCADORA
 #define SERVICO_LOCADORA
 
+#include "boost/date_time/gregorian/gregorian.hpp"
+
 class ServicoLocadora {
 public:
   ServicoLocadora();
 
-  std::shared_ptr<Alocacao> alocarFilmes(Cliente cliente, std::vector<Filme> filmes);
+  std::vector<Alocacao> alocarFilmes(Cliente cliente, boost::gregorian::date_period periodo, std::vector<Filme> filmes) noexcept;
 
-  bool pagarDivida(Cliente cliente, double valor);
+  bool pagarDivida(Alocacao aloc);
 
   bool quitarDivida(Cliente cliente);
 
