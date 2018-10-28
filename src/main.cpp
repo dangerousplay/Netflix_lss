@@ -31,6 +31,7 @@ int main() {
 #include "menus/IMenu.h"
 #include "menus/filme.h"
 #include "menus/cliente.h"
+#include "menus/alocacao.h"
 #include <stdio.h>
 
 // About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually.
@@ -118,8 +119,9 @@ int main(int, char**)
 
     auto filmeMenu = std::make_shared<FilmeMenu>();
     auto clienteMenu = std::make_shared<ClienteMenu>();
+    auto alocacaoMenu = std::make_shared<AlocacaoMenu>();
 
-    std::vector<std::shared_ptr<IMenu>> menus = { filmeMenu, clienteMenu };
+    std::vector<std::shared_ptr<IMenu>> menus = {filmeMenu, clienteMenu, alocacaoMenu};
 
     // Main loop
     while (!glfwWindowShouldClose(window))

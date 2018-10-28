@@ -67,4 +67,48 @@ std::vector<Alocacao> ServicoLocadora::allocacoesEmAtrasoByCliente(Cliente clien
                   ));
 }
 
+std::vector<Filme> ServicoLocadora::getAllFimesNotAllocated() {
+    auto rows = dbInstance->getStorage()
+            .select(columns(&Filme::id,
+                            &Filme::nome,
+                            &Filme::valor,
+                            &Filme::anoLancamento,
+                            &Filme::sinopse,
+                            &Filme::genero,
+                            &Alocacao::id),
+                    left_join<Alocacao>(on(c(&Alocacao::clienteId) == &Filme::id)),
+                    where(is_null(&Alocacao::id)));
+
+    std::vector<Filme> filmes;
+
+    for (auto row : rows) {
+        filmes.emplace_back(std::get<0>(row), std::get<1>(row), std::get<2>(row), std::get<3>(row), std::get<4>(row),
+                            std::get<5>(row));
+    }
+
+    return filmes;
+}
+
+std::vector<Filme> ServicoLocadora::getAllFimesAllocated() {
+    auto rows = dbInstance->getStorage()
+            .select(columns(&Filme::id,
+                            &Filme::nome,
+                            &Filme::valor,
+                            &Filme::anoLancamento,
+                            &Filme::sinopse,
+                            &Filme::genero,
+                            &Alocacao::id),
+                    left_join<Alocacao>(on(c(&Alocacao::clienteId) == &Filme::id)),
+                    where(is_not_null(&Alocacao::id)));
+
+    std::vector<Filme> filmes;
+
+    for (auto row: rows) {
+        filmes.emplace_back(std::get<0>(row), std::get<1>(row), std::get<2>(row), std::get<3>(row), std::get<4>(row),
+                            std::get<5>(row));
+    }
+
+    return filmes;
+}
+
 ServicoLocadora::ServicoLocadora() = default;

@@ -26,6 +26,10 @@ public:
 
   std::vector<Alocacao> allocacoesEmAtrasoByCliente(Cliente cliente);
 
+    std::vector<Filme> getAllFimesNotAllocated();
+
+    std::vector<Filme> getAllFimesAllocated();
+
 };
 
 extern ServicoLocadora servicoLocadora;

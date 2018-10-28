@@ -8,8 +8,6 @@
 #include "../models/Alocacao.h"
 #include "../models/Filme.h"
 
-
-
 #ifndef DATABASE_SQLITE
 #define DATABASE_SQLITE
 
@@ -18,7 +16,7 @@ using namespace sqlite_orm;
 class Database {
 private:
 
-  static internal::storage_t<table_t<internal::column_t<Cliente, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>>, table_t<internal::column_t<Filme, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, double>, internal::column_t<Filme, std::string>>, table_t<internal::column_t<Alocacao, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Alocacao, std::shared_ptr<int>>, internal::column_t<Alocacao, long>, internal::column_t<Alocacao, long>, internal::column_t<Alocacao, std::shared_ptr<int>>, internal::column_t<Alocacao, double>, internal::column_t<Alocacao, bool>, constraints::foreign_key_t<std::shared_ptr<int> Alocacao::*, int Filme::*>, constraints::foreign_key_t<std::shared_ptr<int> Alocacao::*, int Cliente::*>>>
+    static internal::storage_t<table_t<internal::column_t<Cliente, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>, internal::column_t<Cliente, std::string>>, table_t<internal::column_t<Filme, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, std::string>, internal::column_t<Filme, double>, internal::column_t<Filme, std::string>>, table_t<internal::column_t<Alocacao, int, constraints::autoincrement_t, constraints::primary_key_t<>>, internal::column_t<Alocacao, int>, internal::column_t<Alocacao, long>, internal::column_t<Alocacao, long>, internal::column_t<Alocacao, int>, internal::column_t<Alocacao, double>, internal::column_t<Alocacao, bool>, constraints::foreign_key_t<int Alocacao::*, int Filme::*>, constraints::foreign_key_t<int Alocacao::*, int Cliente::*>>>
   initDatabase(std::string filename) {
     auto storage = make_storage(filename,
                                 make_table("clientes",
@@ -65,7 +63,21 @@ public:
   }
 };
 
+class EventHandler {
+private:
+    typedef std::function<void(void)> CallbackFunction;
+    std::vector<CallbackFunction> callbacks;
+
+public:
+
+    void registerOnUpdate(CallbackFunction function);
+
+    void callUpdate();
+};
+
 extern std::unique_ptr<Database> dbInstance;
+
+extern EventHandler globalHandler;
 
 #endif
 

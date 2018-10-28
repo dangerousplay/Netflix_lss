@@ -258,6 +258,8 @@ void FilmeMenu::setOpen(bool open) {
 
 void FilmeMenu::updateFilmes() {
     FilmeMenu::filmes = dbInstance->getStorage().get_all<Filme>();
+
+    globalHandler.callUpdate();
 }
 
 void FilmeMenu::clearFilme() {

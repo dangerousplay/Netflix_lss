@@ -15,6 +15,8 @@ const std::vector<Cliente> &ClienteMenu::getClientes() const {
 
 void ClienteMenu::updateClientes() {
     ClienteMenu::clientes = dbInstance->getStorage().get_all<Cliente>();
+
+    globalHandler.callUpdate();
 }
 
 void ClienteMenu::clearCliente() {

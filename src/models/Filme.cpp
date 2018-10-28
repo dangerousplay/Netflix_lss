@@ -31,12 +31,6 @@ Json Filme::toJsonStruct() {
     return j;
 }
 
-Filme::Filme(int id, const std::string &nome, double valor, const std::string &anoLancamento,
-             const std::string &sinopse, const std::string &genero) : id(id), nome(nome), valor(valor),
-                                                                      anoLancamento(anoLancamento), sinopse(sinopse),
-                                                                      genero(genero) {
-
-}
 
 Filme::Filme() {
     Filme::id = -1;
@@ -54,4 +48,9 @@ bool Filme::operator==(const Filme &rhs) const {
 bool Filme::operator!=(const Filme &rhs) const {
     return !(rhs == *this);
 }
+
+Filme::Filme(int id, const std::string &nome, double valor, const std::string &anoLancamento,
+             const std::string &sinopse, const std::string &genero) : id(id), nome(nome), valor(valor),
+                                                                      anoLancamento(anoLancamento), sinopse(sinopse),
+                                                                      genero(genero) {}
 

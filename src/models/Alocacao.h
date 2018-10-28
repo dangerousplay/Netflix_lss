@@ -16,11 +16,14 @@
 class Alocacao {
 public:
   int id = -1;
-  std::shared_ptr<int> clienteId;
-  std::shared_ptr<int> filmeId;
+    int clienteId;
+    int filmeId;
 
   long dataInicial = 0;
   long dataFinal = 0;
+
+    Filme filme;
+    Cliente cliente;
 
   boost::gregorian::date_period periodoAlocacao = boost::gregorian::date_period(boost::gregorian::date(),boost::gregorian::date());
 
