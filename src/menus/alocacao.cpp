@@ -15,9 +15,17 @@ AlocacaoMenu::AlocacaoMenu() {
     AlocacaoMenu::alocacoes = dbInstance->getStorage().get_all<Alocacao>(where(c(&Alocacao::paga) == false));
     AlocacaoMenu::clientes = dbInstance->getStorage().get_all<Cliente>();
 
+    for (auto aloc: todasAlocacoes) {
+        aloc.init();
+    }
+
+    for (auto aloc: alocacoes) {
+        aloc.init();
+    }
+
     auto instance = this;
 
-    globalHandler.registerOnUpdate([&instance]() {
+    globalHandler.registerOnUpdate([instance]() {
         instance->updateAlocacoes();
     });
 }
@@ -54,9 +62,18 @@ Filme AlocacaoMenu::findFilmeByName(const char *name) {
 }
 
 void AlocacaoMenu::updateAlocacoes() {
-    AlocacaoMenu::filmes = servicoLocadora.getAllFimesNotAllocated();
     AlocacaoMenu::todasAlocacoes = dbInstance->getStorage().get_all<Alocacao>();
     AlocacaoMenu::alocacoes = dbInstance->getStorage().get_all<Alocacao>(where(c(&Alocacao::paga) == false));
+    AlocacaoMenu::filmes = servicoLocadora.getAllFimesNotAllocated();
+    AlocacaoMenu::clientes = dbInstance->getStorage().get_all<Cliente>();
+
+    for (auto aloc: todasAlocacoes) {
+        aloc.init();
+    }
+
+    for (auto aloc: alocacoes) {
+        aloc.init();
+    }
 }
 
 void AlocacaoMenu::clearAlocacao() {
@@ -74,8 +91,8 @@ void AlocacaoMenu::render() {
         std::vector<const char *> clientesStr;
         std::vector<const char *> filmesStr;
 
-        int currentItemCliente = 0;
-        int currentItemFilme = 0;
+        static int currentItemCliente = 0;
+        static int currentItemFilme = 0;
 
         for (const auto &cliente: clientes) {
             clientesStr.push_back(cliente.nome.c_str());
@@ -85,8 +102,8 @@ void AlocacaoMenu::render() {
             filmesStr.push_back(filme.nome.c_str());
         }
 
-        std::vector<const char *> filteredCliente(clientesStr.capacity());
-        std::vector<const char *> filteredFilme(filmesStr.capacity());
+        std::vector<const char *> filteredCliente;
+        std::vector<const char *> filteredFilme;
 
         ImGui::Text("Filtar clientes por nome: ");
 
@@ -96,7 +113,7 @@ void AlocacaoMenu::render() {
 
         auto bufferFilter = AlocacaoMenu::clienteBuffer;
 
-        std::copy_if(clientesStr.begin(), clientesStr.end(), filteredCliente.begin(),
+        std::copy_if(clientesStr.begin(), clientesStr.end(), std::back_inserter(filteredCliente),
                      [&bufferFilter](const char *nome) -> bool {
                          std::string str(bufferFilter.get());
 
@@ -116,9 +133,10 @@ void AlocacaoMenu::render() {
 
         auto bufferFilmeFilter = AlocacaoMenu::filmeBuffer;
 
-        std::copy_if(filmesStr.begin(), filmesStr.end(), filteredFilme.begin(),
+        std::copy_if(filmesStr.begin(), filmesStr.end(), std::back_inserter(filteredFilme),
                      [&bufferFilmeFilter](const char *nome) -> bool {
                          std::string str(bufferFilmeFilter.get());
+
                          return str.empty() ? true :
                                 contains(str, std::string(nome));
                      });
@@ -128,7 +146,10 @@ void AlocacaoMenu::render() {
         ImGui::SameLine();
 
         if (ImGui::Button("Adicionar")) {
-            filmeSelecionados.push_back(findFilmeByName(filteredFilme[currentItemCliente]));
+            auto selected = findFilmeByName(filteredFilme[currentItemFilme]);
+
+            if (std::find(filmeSelecionados.begin(), filmeSelecionados.end(), selected) == filmeSelecionados.end())
+                filmeSelecionados.push_back(selected);
         }
 
         ImGui::Text("Filmes alocados: ");
@@ -190,7 +211,8 @@ void AlocacaoMenu::render() {
 
         if (ImGui::InputText("Data Inicio", dataInicialBuffer.get(), 500)) {
             try {
-                auto dataIn = boost::gregorian::date_from_iso_string(std::string(dataInicialBuffer.get()));
+                auto dataIn = boost::gregorian::date_from_iso_string(
+                        replaceSeparator(std::string(dataInicialBuffer.get())));
                 AlocacaoMenu::atual.dataInicial = toMillisecondsEpoch(dataIn);
             } catch (std::exception &e) {
 
@@ -202,7 +224,8 @@ void AlocacaoMenu::render() {
 
         if (ImGui::InputText("Data Final", dataFinalBuffer.get(), 500)) {
             try {
-                auto dataIn = boost::gregorian::date_from_iso_string(std::string(dataFinalBuffer.get()));
+                auto dataIn = boost::gregorian::date_from_iso_string(
+                        replaceSeparator(std::string(dataFinalBuffer.get())));
                 AlocacaoMenu::atual.dataFinal = toMillisecondsEpoch(dataIn);
             } catch (std::exception &e) {
 
@@ -211,19 +234,31 @@ void AlocacaoMenu::render() {
 
         ImGui::Text("Valor total da alocação: %f", sumFilmValues());
 
+        for (auto message: messageFields) {
+            ImGui::Text(message.c_str());
+        }
+
         if (AlocacaoMenu::editando) {
             if (ImGui::Button("Editar")) {
-                dbInstance->getStorage().update<Alocacao>(AlocacaoMenu::atual);
+                if (validateFields()) {
+                    AlocacaoMenu::atual.clienteId = findClienteByName(filteredCliente[currentItemCliente]);
 
-                AlocacaoMenu::updateAlocacoes();
-                AlocacaoMenu::clearAlocacao();
+                    dbInstance->getStorage().update<Alocacao>(AlocacaoMenu::atual);
+
+                    AlocacaoMenu::updateAlocacoes();
+                    AlocacaoMenu::clearAlocacao();
+                }
             }
         } else {
             if (ImGui::Button("Salvar")) {
-                dbInstance->getStorage().insert<Alocacao>(AlocacaoMenu::atual);
+                if (validateFields()) {
+                    AlocacaoMenu::atual.clienteId = findClienteByName(filteredCliente[currentItemCliente]);
 
-                AlocacaoMenu::updateAlocacoes();
-                AlocacaoMenu::clearAlocacao();
+                    servicoLocadora.alocarFilmes(AlocacaoMenu::atual, filmeSelecionados);
+
+                    AlocacaoMenu::updateAlocacoes();
+                    AlocacaoMenu::clearAlocacao();
+                }
             }
         }
     }
@@ -323,9 +358,9 @@ void AlocacaoMenu::render() {
         }
 
         ImGui::Columns(8);
-        std::vector<Alocacao> filtered(AlocacaoMenu::alocacoes.capacity());
+        std::vector<Alocacao> filtered;
 
-        std::copy_if(AlocacaoMenu::alocacoes.begin(), AlocacaoMenu::alocacoes.end(), filtered.begin(),
+        std::copy_if(AlocacaoMenu::alocacoes.begin(), AlocacaoMenu::alocacoes.end(), std::back_inserter(filtered),
                      [filter](Alocacao alocacao) {
                          return filter.empty() ? true :
                                 contains(filter, std::to_string(alocacao.valor)) ? true :
@@ -393,6 +428,58 @@ void AlocacaoMenu::render() {
     }
 
     ImGui::TreePop();
+}
+
+bool AlocacaoMenu::validateFields() {
+    std::string message;
+
+    message = "Deve haver amenos um filme alocado!";
+    removeDuplicates(message);
+
+    if (filmeSelecionados.empty()) {
+        messageFields.push_back(message);
+        return false;
+    }
+
+    message = "A data inicial deve conter um valor válido!";
+    removeDuplicates(message);
+
+    std::regex dateRegex{R"([0-9]{4}-[0-9]{2}-[0-9]{2})"};
+
+    std::string dataInicial = std::string(dataInicialBuffer.get());
+    std::string dataFinal = std::string(dataFinalBuffer.get());
+
+    if (!std::regex_match(dataInicial, dateRegex)) {
+        messageFields.push_back(message);
+        return false;
+    }
+
+    message = "A data final deve conter um valor válido!";
+    removeDuplicates(message);
+
+    if (!std::regex_match(dataFinal, dateRegex)) {
+        messageFields.push_back(message);
+        return false;
+    }
+
+    boost::gregorian::date dateInicialG = boost::gregorian::date_from_iso_string(replaceSeparator(dataInicial));
+    boost::gregorian::date dateFinalG = boost::gregorian::date_from_iso_string(replaceSeparator(dataFinal));
+
+    message = "A data final e inicial deve, conter um periodo válido!";
+    removeDuplicates(message);
+
+    if (toMillisecondsEpoch(dateFinalG) <= toMillisecondsEpoch(dateInicialG)) {
+        messageFields.push_back(message);
+        return false;
+    }
+
+    return true;
+}
+
+void AlocacaoMenu::removeDuplicates(std::string &b) {
+    messageFields.erase(std::remove_if(messageFields.begin(), messageFields.end(), [b](std::string a) {
+        return a == b;
+    }), messageFields.end());
 }
 
 

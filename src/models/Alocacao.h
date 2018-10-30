@@ -14,6 +14,9 @@
 
 
 class Alocacao {
+private:
+
+
 public:
   int id = -1;
     int clienteId;
@@ -48,6 +51,8 @@ public:
   void setDataFinal(boost::gregorian::date data);
 
   void setPeriodo(boost::gregorian::date_period periodo);
+
+    void init();
 
   bool operator==(const Alocacao &rhs) const;
 

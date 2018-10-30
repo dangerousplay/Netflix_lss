@@ -17,18 +17,21 @@ std::vector<Alocacao> ServicoLocadora::alocarFilmes(Cliente cliente, boost::greg
         throw std::exception();
     }
 
-    std::vector<Alocacao> alocacoes;
+    std::vector<Alocacao> alocacoes(filmes.size());
 
-    std::transform(filmes.begin(), filmes.end(), alocacoes.begin(), [&cliente, &periodo](Filme filme) -> Alocacao {
+    std::transform(filmes.begin(), filmes.end(), alocacoes.begin(), [cliente, periodo](Filme filme) -> Alocacao {
         return Alocacao(-1, cliente.id, filme.id, periodo, filme.valor);
     });
 
-    dbInstance->getStorage().begin_transaction();
-
-    dbInstance->getStorage().insert_range(alocacoes.begin(), alocacoes.end());
-
-    dbInstance->getStorage().commit();
-
+    dbInstance->getStorage().transaction([alocacoes]() -> bool {
+        try {
+            dbInstance->getStorage().insert_range(alocacoes.begin(), alocacoes.end());
+            return true;
+        } catch (std::exception &e) {
+            std::cout << e.what();
+            return false;
+        }
+    });
 }
 
 bool ServicoLocadora::quitarDivida(Cliente cliente) {
@@ -109,6 +112,25 @@ std::vector<Filme> ServicoLocadora::getAllFimesAllocated() {
     }
 
     return filmes;
+}
+
+void ServicoLocadora::alocarFilmes(Alocacao alocacao, std::vector<Filme> filmes) {
+
+    dbInstance->getStorage().transaction([alocacao, filmes]() -> bool {
+        try {
+            auto atual = alocacao;
+            for (auto filme: filmes) {
+                atual.filmeId = filme.id;
+
+                dbInstance->getStorage().insert<Alocacao>(atual);
+            }
+        } catch (std::exception &e) {
+            std::cout << e.what();
+            return false;
+        }
+
+        return true;
+    });
 }
 
 ServicoLocadora::ServicoLocadora() = default;

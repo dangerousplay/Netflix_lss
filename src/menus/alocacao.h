@@ -24,6 +24,8 @@ private:
     std::shared_ptr<char> dataFinalBuffer = std::shared_ptr<char>((char *) calloc(501, sizeof(char)));
     std::shared_ptr<char> bufferPesquisaF = std::shared_ptr<char>((char *) calloc(501, sizeof(char)));
 
+    std::vector<std::string> messageFields;
+
     Alocacao atual = Alocacao();
 
     bool editando = false;
@@ -39,6 +41,10 @@ private:
     void updateAlocacoes();
 
     void clearAlocacao();
+
+    bool validateFields();
+
+    void removeDuplicates(std::string &b);
 
 public:
     AlocacaoMenu();

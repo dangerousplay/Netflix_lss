@@ -40,4 +40,6 @@ long toMilliseconds(time_t time);
 
 long toMillisecondsEpoch(const boost::gregorian::date& date);
 
+std::string replaceSeparator(std::string time);
+
 #endif //NETFLIX_LSS_UNIXTIME_H

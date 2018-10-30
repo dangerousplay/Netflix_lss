@@ -18,6 +18,8 @@ public:
 
   std::vector<Alocacao> alocarFilmes(Cliente cliente, boost::gregorian::date_period periodo, std::vector<Filme> filmes) noexcept;
 
+    void alocarFilmes(Alocacao alocacao, std::vector<Filme> filmes);
+
   bool pagarDivida(Alocacao aloc);
 
   bool quitarDivida(Cliente cliente);

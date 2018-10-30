@@ -164,9 +164,10 @@ void FilmeMenu::render() {
         }
 
         ImGui::Columns(7);
-        std::vector<Filme> filtered(FilmeMenu::filmes.capacity());
+        std::vector<Filme> filtered;
 
-        std::copy_if(FilmeMenu::filmes.begin(), FilmeMenu::filmes.end(), filtered.begin(), [filter](Filme filme) {
+        std::copy_if(FilmeMenu::filmes.begin(), FilmeMenu::filmes.end(), std::back_inserter(filtered),
+                     [filter](Filme filme) {
             return filter.empty()                                      ? true :
                    contains(filter, std::to_string(filme.valor))  ? true :
                    contains(filter, filme.genero               )  ? true :

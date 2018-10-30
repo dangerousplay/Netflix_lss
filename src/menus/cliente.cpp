@@ -158,10 +158,11 @@ void ClienteMenu::render() {
 
 
         std::string filter = bufferPesquisa.get();
-        std::vector<Cliente> filtered(ClienteMenu::clientes.capacity());
+        std::vector<Cliente> filtered;
         Cliente cliente = ClienteMenu::atual;
 
-        std::copy_if(ClienteMenu::clientes.begin(), ClienteMenu::clientes.end(), filtered.begin(), [filter,cliente](Cliente cliente) {
+        std::copy_if(ClienteMenu::clientes.begin(), ClienteMenu::clientes.end(), std::back_inserter(filtered),
+                     [filter, cliente](Cliente cliente) {
             return filter.empty()                                      ? true :
                    contains(filter, cliente.endereco              )    ? true :
                    contains(filter, cliente.nome                  )    ? true :

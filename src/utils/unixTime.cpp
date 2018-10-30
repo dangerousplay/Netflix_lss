@@ -2,6 +2,7 @@
 // Created by dangerous on 27/10/18.
 //
 
+#include <regex>
 #include "unixTime.h"
 
 
@@ -22,4 +23,10 @@ long toMillisecondsEpoch(const boost::gregorian::date &date) {
 
 long toMilliseconds(time_t time) {
     return boost::posix_time::microseconds(time).total_milliseconds();
+}
+
+std::string replaceSeparator(std::string time) {
+    std::regex specialChars{R"(-)"};
+
+    return std::regex_replace(time, specialChars, R"()");
 }
