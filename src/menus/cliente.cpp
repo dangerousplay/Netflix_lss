@@ -134,13 +134,10 @@ void ClienteMenu::render() {
         }
     }
 
-    ImGui::Separator();
-    ImGui::Separator();
-
-    ImGui::Text("Pesquisar: ");
-    ImGui::InputText("Pesquisar", bufferPesquisa.get(), 512);
-
+    if (ImGui::CollapsingHeader("Pesquisar clientes"))
     {
+        ImGui::Text("Pesquisar: ");
+        ImGui::InputText("Pesquisar", bufferPesquisa.get(), 512);
 
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
         ImGui::BeginChild("Child2", ImVec2(0,300));
@@ -155,6 +152,11 @@ void ClienteMenu::render() {
             ImGui::EndMenuBar();
         }
 
+        for (int i = 0; i < 6; i++) {
+            ImGui::Spacing();
+        }
+
+        ImGui::Separator();
 
 
         std::string filter = bufferPesquisa.get();

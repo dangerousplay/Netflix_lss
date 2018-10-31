@@ -10,8 +10,6 @@ class AlocacaoMenu : public IMenu {
 private:
     std::vector<Alocacao> alocacoes;
 
-    std::vector<Alocacao> todasAlocacoes;
-
     std::vector<Cliente> clientes;
 
     std::vector<Filme> filmes;

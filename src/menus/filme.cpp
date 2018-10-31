@@ -141,13 +141,9 @@ void FilmeMenu::render() {
         }
     }
 
-    ImGui::Separator();
-    ImGui::Separator();
-
-    ImGui::Text("Pesquisar: ");
-    ImGui::InputText("Pesquisar", bufferPesquisaF.get(), 512);
-
-    {
+    if (ImGui::CollapsingHeader("Pesquisar Filmes")) {
+        ImGui::Text("Pesquisar: ");
+        ImGui::InputText("Pesquisar", bufferPesquisaF.get(), 512);
         std::string filter = bufferPesquisaF.get();
 
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
@@ -162,6 +158,12 @@ void FilmeMenu::render() {
             }
             ImGui::EndMenuBar();
         }
+
+        for (int i = 0; i < 6; i++) {
+            ImGui::Spacing();
+        }
+
+        ImGui::Separator();
 
         ImGui::Columns(7);
         std::vector<Filme> filtered;

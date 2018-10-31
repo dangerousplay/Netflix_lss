@@ -11,13 +11,8 @@
 
 AlocacaoMenu::AlocacaoMenu() {
     AlocacaoMenu::filmes = servicoLocadora.getAllFimesNotAllocated();
-    AlocacaoMenu::todasAlocacoes = dbInstance->getStorage().get_all<Alocacao>();
-    AlocacaoMenu::alocacoes = dbInstance->getStorage().get_all<Alocacao>(where(c(&Alocacao::paga) == false));
+    AlocacaoMenu::alocacoes = dbInstance->getStorage().get_all<Alocacao>();
     AlocacaoMenu::clientes = dbInstance->getStorage().get_all<Cliente>();
-
-    for (auto aloc: todasAlocacoes) {
-        aloc.init();
-    }
 
     for (auto aloc: alocacoes) {
         aloc.init();
@@ -62,14 +57,9 @@ Filme AlocacaoMenu::findFilmeByName(const char *name) {
 }
 
 void AlocacaoMenu::updateAlocacoes() {
-    AlocacaoMenu::todasAlocacoes = dbInstance->getStorage().get_all<Alocacao>();
     AlocacaoMenu::alocacoes = dbInstance->getStorage().get_all<Alocacao>(where(c(&Alocacao::paga) == false));
     AlocacaoMenu::filmes = servicoLocadora.getAllFimesNotAllocated();
     AlocacaoMenu::clientes = dbInstance->getStorage().get_all<Cliente>();
-
-    for (auto aloc: todasAlocacoes) {
-        aloc.init();
-    }
 
     for (auto aloc: alocacoes) {
         aloc.init();
@@ -203,7 +193,6 @@ void AlocacaoMenu::render() {
         ImGui::EndChild();
         ImGui::PopStyleVar();
 
-
         ImGui::Text("Data Inicio: ");
         std::string exampleData = boost::gregorian::to_iso_extended_string(boost::gregorian::day_clock::local_day());
 
@@ -264,8 +253,10 @@ void AlocacaoMenu::render() {
     }
 
     if (ImGui::CollapsingHeader("Pesquisar Alocações")) {
+        ImGui::Text("Pesquisar: ");
+        ImGui::InputText("Pesquisar", bufferPesquisaF.get(), 512);
 
-        ImGui::Text("Todas alocações: ");
+        std::string filter = bufferPesquisaF.get();
 
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
         ImGui::BeginChild("Child2", ImVec2(0, 300));
@@ -278,9 +269,29 @@ void AlocacaoMenu::render() {
             ImGui::EndMenuBar();
         }
 
-        ImGui::Columns(8);
+        for (int i = 0; i < 6; i++) {
+            ImGui::Spacing();
+        }
 
-        for (auto alocacao: todasAlocacoes) {
+        ImGui::Separator();
+
+        ImGui::Columns(9);
+        std::vector<Alocacao> filtered;
+
+        std::copy_if(AlocacaoMenu::alocacoes.begin(), AlocacaoMenu::alocacoes.end(), std::back_inserter(filtered),
+                     [filter](Alocacao alocacao) {
+                         return filter.empty() ? true :
+                                contains(filter, std::to_string(alocacao.valor)) ? true :
+                                contains(filter, alocacao.filme.nome) ? true :
+                                contains(filter, alocacao.cliente.nome) ? true :
+                                contains(filter, boost::gregorian::to_iso_string(alocacao.periodoAlocacao.begin()))
+                                ? true :
+                                contains(filter, boost::gregorian::to_iso_string(alocacao.periodoAlocacao.end()));
+                     });
+
+        for (auto alocacao: filtered) {
+            alocacao.init();
+
             ImGui::PushID(alocacao.id);
 
             ImGui::Text(alocacao.cliente.nome.c_str());
@@ -329,86 +340,10 @@ void AlocacaoMenu::render() {
 
             ImGui::NextColumn();
 
-            ImGui::PopID();
-        }
+            if (ImGui::Button("Pagar") && !alocacao.paga) {
+                alocacao.paga = true;
 
-        ImGui::EndChild();
-        ImGui::PopStyleVar();
-
-    }
-
-    ImGui::Separator();
-    ImGui::Separator();
-
-    ImGui::Text("Pesquisar: ");
-    ImGui::InputText("Pesquisar", bufferPesquisaF.get(), 512);
-
-    {
-        std::string filter = bufferPesquisaF.get();
-
-        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
-        ImGui::BeginChild("Child2", ImVec2(0, 300));
-
-        if (ImGui::BeginMenuBar()) {
-            if (ImGui::BeginMenu("Menu")) {
-
-                ImGui::EndMenu();
-            }
-            ImGui::EndMenuBar();
-        }
-
-        ImGui::Columns(8);
-        std::vector<Alocacao> filtered;
-
-        std::copy_if(AlocacaoMenu::alocacoes.begin(), AlocacaoMenu::alocacoes.end(), std::back_inserter(filtered),
-                     [filter](Alocacao alocacao) {
-                         return filter.empty() ? true :
-                                contains(filter, std::to_string(alocacao.valor)) ? true :
-                                contains(filter, alocacao.filme.nome) ? true :
-                                contains(filter, alocacao.cliente.nome) ? true :
-                                contains(filter, boost::gregorian::to_iso_string(alocacao.periodoAlocacao.begin()))
-                                ? true :
-                                contains(filter, boost::gregorian::to_iso_string(alocacao.periodoAlocacao.end()));
-                     });
-
-        for (auto alocacao: filtered) {
-            ImGui::PushID(alocacao.id);
-
-            ImGui::Text(alocacao.cliente.nome.c_str());
-
-            ImGui::NextColumn();
-
-            ImGui::Text(alocacao.filme.nome.c_str());
-
-            ImGui::NextColumn();
-
-            ImGui::Text(boost::gregorian::to_iso_string(alocacao.periodoAlocacao.begin()).c_str());
-
-            ImGui::NextColumn();
-
-            ImGui::Text(boost::gregorian::to_iso_string(alocacao.periodoAlocacao.end()).c_str());
-
-            ImGui::NextColumn();
-
-            ImGui::Text(std::to_string(alocacao.valor).c_str());
-
-            ImGui::NextColumn();
-
-            ImGui::Text("Paga: %s", alocacao.paga ? "Sim" : "Não");
-
-            ImGui::NextColumn();
-
-            if (ImGui::Button("Alterar")) {
-                AlocacaoMenu::atual = alocacao;
-                filmeSelecionados = {alocacao.filme};
-
-                AlocacaoMenu::editando = true;
-            }
-
-            ImGui::NextColumn();
-
-            if (ImGui::Button("Remover")) {
-                dbInstance->getStorage().remove<Alocacao>(alocacao.id);
+                dbInstance->getStorage().update(alocacao);
 
                 updateAlocacoes();
 

@@ -81,7 +81,6 @@ void Alocacao::setPeriodo(boost::gregorian::date_period periodo) {
 
 void Alocacao::init() {
     Alocacao::periodoAlocacao = boost::gregorian::date_period(to_bdate(dataInicial), to_bdate(dataFinal));
-
     Alocacao::filme = dbInstance->getStorage().get<Filme>(filmeId);
     Alocacao::cliente = dbInstance->getStorage().get<Cliente>(clienteId);
 }
