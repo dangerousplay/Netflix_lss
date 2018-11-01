@@ -19,16 +19,19 @@ private:
 
 public:
   int id = -1;
-    int clienteId;
-    int filmeId;
+  int clienteId;
+  int filmeId;
 
   long dataInicial = 0;
   long dataFinal = 0;
+  long dataEntrega = 0;
 
-    Filme filme;
-    Cliente cliente;
+  Filme filme;
+  Cliente cliente;
 
   boost::gregorian::date_period periodoAlocacao = boost::gregorian::date_period(boost::gregorian::date(),boost::gregorian::date());
+
+  boost::gregorian::date dataEntregaP = boost::gregorian::date();
 
   double valor = 0;
 
@@ -37,7 +40,7 @@ public:
   Alocacao(int id, int clienteId, int filmeId, boost::gregorian::date_period periodo,
            double valor);
 
-  Alocacao(int id, int clienteId, int filmeId, long dataInicial, long dataFinal, double valor, bool paga);
+  Alocacao(int id, int clienteId, int filmeId, long dataInicial, long dataFinal, long dataEntrega, double valor, bool paga);
 
 
   Alocacao();

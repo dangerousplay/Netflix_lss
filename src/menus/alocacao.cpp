@@ -57,7 +57,7 @@ Filme AlocacaoMenu::findFilmeByName(const char *name) {
 }
 
 void AlocacaoMenu::updateAlocacoes() {
-    AlocacaoMenu::alocacoes = dbInstance->getStorage().get_all<Alocacao>(where(c(&Alocacao::paga) == false));
+    AlocacaoMenu::alocacoes = dbInstance->getStorage().get_all<Alocacao>();
     AlocacaoMenu::filmes = servicoLocadora.getAllFimesNotAllocated();
     AlocacaoMenu::clientes = dbInstance->getStorage().get_all<Cliente>();
 
@@ -67,11 +67,14 @@ void AlocacaoMenu::updateAlocacoes() {
 }
 
 void AlocacaoMenu::clearAlocacao() {
+    AlocacaoMenu::filmeSelecionados.clear();
     AlocacaoMenu::atual = Alocacao();
+    AlocacaoMenu::dataInicialBuffer = std::shared_ptr<char>((char*)calloc(501, sizeof(char)));
+    AlocacaoMenu::dataFinalBuffer = std::shared_ptr<char>((char*)calloc(501, sizeof(char)));
 }
 
 void AlocacaoMenu::render() {
-    ImGui::SetNextWindowSize(ImVec2(600, 500), 0);
+    ImGui::SetNextWindowSize(ImVec2(900, 500), 0);
 
     ImGui::Begin("Alocação");
 
@@ -154,6 +157,12 @@ void AlocacaoMenu::render() {
             }
             ImGui::EndMenuBar();
         }
+
+        for (int i = 0; i < 6; i++) {
+            ImGui::Spacing();
+        }
+
+        ImGui::Separator();
 
         ImGui::Columns(6);
 
@@ -302,11 +311,11 @@ void AlocacaoMenu::render() {
 
             ImGui::NextColumn();
 
-            ImGui::Text(boost::gregorian::to_iso_string(alocacao.periodoAlocacao.begin()).c_str());
+            ImGui::Text(boost::gregorian::to_iso_extended_string(alocacao.periodoAlocacao.begin()).c_str());
 
             ImGui::NextColumn();
 
-            ImGui::Text(boost::gregorian::to_iso_string(alocacao.periodoAlocacao.end()).c_str());
+            ImGui::Text(boost::gregorian::to_iso_extended_string(alocacao.periodoAlocacao.end()).c_str());
 
             ImGui::NextColumn();
 
@@ -322,7 +331,20 @@ void AlocacaoMenu::render() {
                 AlocacaoMenu::atual = alocacao;
                 filmeSelecionados = {alocacao.filme};
 
+                auto dataInicial = boost::gregorian::to_iso_extended_string(alocacao.periodoAlocacao.begin());
+                auto dataFinal = boost::gregorian::to_iso_extended_string(alocacao.periodoAlocacao.end());
+
+                std::shared_ptr<char> sDataInicial = std::shared_ptr<char>((char*)calloc(501, sizeof(char)));
+
+                dataInicial.copy(sDataInicial.get(), dataInicial.size());
+
+                std::shared_ptr<char> sDataFinal = std::shared_ptr<char>((char*)calloc(501, sizeof(char)));
+
+                dataFinal.copy(sDataFinal.get(), dataFinal.size());
+
                 AlocacaoMenu::editando = true;
+                AlocacaoMenu::dataInicialBuffer = sDataInicial;
+                AlocacaoMenu::dataFinalBuffer = sDataFinal;
             }
 
             ImGui::NextColumn();

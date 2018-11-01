@@ -79,7 +79,7 @@ std::vector<Filme> ServicoLocadora::getAllFimesNotAllocated() {
                             &Filme::sinopse,
                             &Filme::genero,
                             &Alocacao::id),
-                    left_join<Alocacao>(on(c(&Alocacao::clienteId) == &Filme::id)),
+                    left_join<Alocacao>(on(c(&Alocacao::filmeId) == &Filme::id)),
                     where(is_null(&Alocacao::id)));
 
     std::vector<Filme> filmes;
@@ -101,7 +101,7 @@ std::vector<Filme> ServicoLocadora::getAllFimesAllocated() {
                             &Filme::sinopse,
                             &Filme::genero,
                             &Alocacao::id),
-                    left_join<Alocacao>(on(c(&Alocacao::clienteId) == &Filme::id)),
+                    left_join<Alocacao>(on(c(&Alocacao::filmeId) == &Filme::id)),
                     where(is_not_null(&Alocacao::id)));
 
     std::vector<Filme> filmes;
@@ -121,6 +121,7 @@ void ServicoLocadora::alocarFilmes(Alocacao alocacao, std::vector<Filme> filmes)
             auto atual = alocacao;
             for (auto filme: filmes) {
                 atual.filmeId = filme.id;
+                atual.valor = filme.valor;
 
                 dbInstance->getStorage().insert<Alocacao>(atual);
             }

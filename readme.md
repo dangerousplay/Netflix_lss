@@ -1,6 +1,5 @@
 Componentes do Grupo: Davi Henrique, Josué William e Moisés Alcides
 
-
 To compile this project you will need CMake, GCC and Conan
 
 You will need bincrafters remote repository added on conan

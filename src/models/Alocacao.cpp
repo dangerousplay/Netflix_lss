@@ -25,7 +25,7 @@ Alocacao::Alocacao(int id, int clienteId, int filmeId, const boost::gregorian::d
 
 Alocacao::Alocacao() {}
 
-Alocacao::Alocacao(int id, int clienteId, int filmeId, long dataInicial, long dataFinal, double valor, bool paga) : id(
+Alocacao::Alocacao(int id, int clienteId, int filmeId, long dataInicial, long dataFinal, long dataEntrega, double valor, bool paga) : id(
         id), clienteId(clienteId), filmeId(filmeId), dataInicial(dataInicial), dataFinal(dataFinal), valor(valor),
                                                                                                                     paga(paga) {
     Alocacao::periodoAlocacao = boost::gregorian::date_period(to_bdate(dataInicial),to_bdate(dataFinal));
@@ -41,7 +41,8 @@ std::string Alocacao::toJson() {
             {"dataInicial", Alocacao::dataInicial},
             {"dataFinal", Alocacao::dataFinal},
             {"filmeId", Alocacao::filmeId},
-            {"valor", Alocacao::valor}
+            {"valor", Alocacao::valor},
+            {"dataEntrega", Alocacao::dataEntrega}
     };
 
 
@@ -51,7 +52,7 @@ std::string Alocacao::toJson() {
 Alocacao Alocacao::fromJson(std::string json) {
     Json j = Json::parse(json);
 
-    return Alocacao(j["id"], j["clienteId"], j["filmeId"], j["dataInicial"], j["dataFinal"], j["valor"], j["paga"]);
+    return Alocacao(j["id"], j["clienteId"], j["filmeId"], j["dataInicial"], j["dataFinal"], j["dataEntrega"], j["valor"], j["paga"]);
 }
 
 bool Alocacao::operator==(const Alocacao &rhs) const {
