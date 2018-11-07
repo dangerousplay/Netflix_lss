@@ -22,6 +22,8 @@ private:
     std::shared_ptr<char> dataFinalBuffer = std::shared_ptr<char>((char *) calloc(501, sizeof(char)));
     std::shared_ptr<char> bufferPesquisaF = std::shared_ptr<char>((char *) calloc(501, sizeof(char)));
 
+    std::shared_ptr<bool> atrasada = std::make_shared<bool>(0);
+
     std::vector<std::string> messageFields;
 
     Alocacao atual = Alocacao();

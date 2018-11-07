@@ -26,8 +26,9 @@ Alocacao::Alocacao(int id, int clienteId, int filmeId, const boost::gregorian::d
 Alocacao::Alocacao() {}
 
 Alocacao::Alocacao(int id, int clienteId, int filmeId, long dataInicial, long dataFinal, long dataEntrega, double valor, bool paga) : id(
-        id), clienteId(clienteId), filmeId(filmeId), dataInicial(dataInicial), dataFinal(dataFinal), valor(valor),
-                                                                                                                    paga(paga) {
+        id), clienteId(clienteId), filmeId(filmeId), dataInicial(dataInicial), dataFinal(dataFinal), dataEntrega(
+        dataEntrega), valor(valor),
+                                                                                                                                      paga(paga) {
     Alocacao::periodoAlocacao = boost::gregorian::date_period(to_bdate(dataInicial),to_bdate(dataFinal));
 
     Alocacao::filme = dbInstance->getStorage().get<Filme>(filmeId);
@@ -84,6 +85,7 @@ void Alocacao::init() {
     Alocacao::periodoAlocacao = boost::gregorian::date_period(to_bdate(dataInicial), to_bdate(dataFinal));
     Alocacao::filme = dbInstance->getStorage().get<Filme>(filmeId);
     Alocacao::cliente = dbInstance->getStorage().get<Cliente>(clienteId);
+    Alocacao::dataEntregaP = to_bdate(dataEntrega);
 }
 
 

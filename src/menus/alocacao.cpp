@@ -265,6 +265,8 @@ void AlocacaoMenu::render() {
         ImGui::Text("Pesquisar: ");
         ImGui::InputText("Pesquisar", bufferPesquisaF.get(), 512);
 
+        ImGui::Checkbox("Alocacões Atrasadas", atrasada.get());
+
         std::string filter = bufferPesquisaF.get();
 
         ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 5.0f);
@@ -284,8 +286,11 @@ void AlocacaoMenu::render() {
 
         ImGui::Separator();
 
-        ImGui::Columns(9);
+        ImGui::Columns(11);
+
         std::vector<Alocacao> filtered;
+
+        auto atrasada = AlocacaoMenu::atrasada;
 
         std::copy_if(AlocacaoMenu::alocacoes.begin(), AlocacaoMenu::alocacoes.end(), std::back_inserter(filtered),
                      [filter](Alocacao alocacao) {
@@ -297,6 +302,14 @@ void AlocacaoMenu::render() {
                                 ? true :
                                 contains(filter, boost::gregorian::to_iso_string(alocacao.periodoAlocacao.end()));
                      });
+
+        std::remove_if(filtered.begin(), filtered.end(), [atrasada](Alocacao aloc) {
+            if (!*atrasada.get())
+                return true;
+
+            auto now = toMillisecondsEpoch(boost::gregorian::day_clock::local_day());
+            auto isOut = (*atrasada.get() ? aloc.dataFinal < now && aloc.dataEntrega == 0 : true);
+        });
 
         for (auto alocacao: filtered) {
             alocacao.init();
@@ -324,6 +337,11 @@ void AlocacaoMenu::render() {
             ImGui::NextColumn();
 
             ImGui::Text("Paga: %s", alocacao.paga ? "Sim" : "Não");
+
+            ImGui::NextColumn();
+
+            ImGui::Text("Entregue: %s", alocacao.dataEntrega != 0 ? boost::gregorian::to_iso_extended_string(
+                    alocacao.dataEntregaP).c_str() : "");
 
             ImGui::NextColumn();
 
@@ -376,6 +394,19 @@ void AlocacaoMenu::render() {
             }
 
             ImGui::NextColumn();
+
+            if (ImGui::Button("Entregar") && alocacao.dataEntrega == 0) {
+                alocacao.dataEntrega = toMilliseconds(to_time_t(boost::gregorian::day_clock::local_day()));
+
+                dbInstance->getStorage().update(alocacao);
+
+                updateAlocacoes();
+
+                if (AlocacaoMenu::editando)
+                    AlocacaoMenu::editando = false;
+
+                clearAlocacao();
+            }
 
             ImGui::PopID();
         }
