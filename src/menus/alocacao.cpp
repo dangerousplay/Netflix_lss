@@ -293,23 +293,20 @@ void AlocacaoMenu::render() {
         auto atrasada = AlocacaoMenu::atrasada;
 
         std::copy_if(AlocacaoMenu::alocacoes.begin(), AlocacaoMenu::alocacoes.end(), std::back_inserter(filtered),
-                     [filter](Alocacao alocacao) {
+                     [filter, atrasada](Alocacao alocacao) {
+
+                         auto now = toMillisecondsEpoch(boost::gregorian::day_clock::local_day());
+                         auto isOut = (*atrasada.get() ? alocacao.dataFinal < now && alocacao.dataEntrega == 0 : true);
+
                          return filter.empty() ? true :
                                 contains(filter, std::to_string(alocacao.valor)) ? true :
                                 contains(filter, alocacao.filme.nome) ? true :
                                 contains(filter, alocacao.cliente.nome) ? true :
                                 contains(filter, boost::gregorian::to_iso_string(alocacao.periodoAlocacao.begin()))
                                 ? true :
-                                contains(filter, boost::gregorian::to_iso_string(alocacao.periodoAlocacao.end()));
+                                contains(filter, boost::gregorian::to_iso_string(alocacao.periodoAlocacao.end())) ? true :
+                                *atrasada.get() ? isOut : true;
                      });
-
-        std::remove_if(filtered.begin(), filtered.end(), [atrasada](Alocacao aloc) {
-            if (!*atrasada.get())
-                return true;
-
-            auto now = toMillisecondsEpoch(boost::gregorian::day_clock::local_day());
-            auto isOut = (*atrasada.get() ? aloc.dataFinal < now && aloc.dataEntrega == 0 : true);
-        });
 
         for (auto alocacao: filtered) {
             alocacao.init();

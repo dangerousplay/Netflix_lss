@@ -30,6 +30,22 @@ add_executable(${PROJECT_NAME}
         src/menus/cliente.h
         src/menus/alocacao.cpp
         src/menus/alocacao.h
-        src/utils/stringUtils.h src/db/init.cpp src/utils/stringUtils.cpp src/menus/relatorio.cpp src/menus/relatorio.h src/utils/unixTime.cpp src/utils/unixTime.h)
+        src/utils/stringUtils.h
+        src/db/init.cpp
+        src/utils/stringUtils.cpp
+        src/menus/relatorio.cpp
+        src/menus/relatorio.h
+        src/utils/unixTime.cpp
+        src/utils/unixTime.h)
 
-target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS})
+include_directories(pdf)
+
+link_directories(lib pdf)
+
+add_library(pdf STATIC IMPORTED) # or STATIC instead of SHARED
+set_target_properties(pdf PROPERTIES
+        IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/lib/libpdf.a"
+        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/pdf"
+        )
+
+target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS} pdf)

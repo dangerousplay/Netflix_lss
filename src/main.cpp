@@ -33,6 +33,7 @@ int main() {
 #include "menus/cliente.h"
 #include "menus/alocacao.h"
 #include <stdio.h>
+#include "pdf.h"
 
 // About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually.
 // Helper libraries are often used for this purpose! Here we are supporting a few common ones: gl3w, glew, glad.
@@ -56,6 +57,11 @@ static void glfw_error_callback(int error, const char* description)
 
 int main(int, char**)
 {
+    //generatePDF(ids []int, dataInicial []uint64, dataFinal []uint64, dataEntrega []uint64, valores []float64, multas []float64) ([]byte, error)
+
+    int ids[] = {0,1,2,3,4};
+
+    generatePDF(GoSlice{ ids, 5,5 }, GoSlice{ ids, 5,5 }, GoSlice{ ids, 5,5 }, GoSlice{ ids, 5,5 }, GoSlice{ ids, 5,5 }, GoSlice{ ids, 5,5 });
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
