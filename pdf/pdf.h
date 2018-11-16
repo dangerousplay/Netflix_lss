@@ -55,6 +55,7 @@ typedef void *GoMap;
 typedef void *GoChan;
 typedef struct { void *t; void *v; } GoInterface;
 typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
+typedef GoInterface GoAlocacao;
 
 #endif
 
@@ -64,15 +65,19 @@ typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 extern "C" {
 #endif
 
+//func createAlocacao(id int, dataInicial uint64, dataFinal uint64, dataEntrega uint64, valor float64, multa float64) interface{} {
+extern GoAlocacao
+createAlocacao(GoInt id, GoUint64 dataInicial, GoUint64 dataFinal, GoUint64 dataEntrega, GoFloat64 valor,
+               GoFloat64 multa);
 
 /* Return type for generatePDF */
 struct generatePDF_return {
-	GoSlice r0;
-	GoInterface r1;
+    void *r0;
+    int r1;
 };
 
-//generatePDF(ids []int, dataInicial []uint64, dataFinal []uint64, dataEntrega []uint64, valores []float64, multas []float64) ([]byte, error)
-extern struct generatePDF_return generatePDF(GoSlice p0, GoSlice p1, GoSlice p2, GoSlice p3, GoSlice p4, GoSlice p5);
+
+extern struct generatePDF_return generatePDF(GoSlice p0);
 
 #ifdef __cplusplus
 }

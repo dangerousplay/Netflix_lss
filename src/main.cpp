@@ -10,21 +10,6 @@
 #include <stb_rect_pack.h>
 #include <imconfig.h>
 
-/*using namespace sqlite_orm;
-
-using json = nlohmann::json;
-
-int main() {
-
-  Cliente t {1,"nome", "Ednereco",0};
-
-  std::cout << "Json: " << t.toJson() << std::endl;
-
-  Cliente fr = Cliente::fromJson(t.toJson());
-
-  return 0;
-}*/
-
 #include "imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
@@ -49,6 +34,8 @@ int main() {
 #endif
 
 #include <GLFW/glfw3.h> // Include glfw3.h after our OpenGL definitions
+#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <fstream>
 
 static void glfw_error_callback(int error, const char* description)
 {
@@ -59,9 +46,34 @@ int main(int, char**)
 {
     //generatePDF(ids []int, dataInicial []uint64, dataFinal []uint64, dataEntrega []uint64, valores []float64, multas []float64) ([]byte, error)
 
-    int ids[] = {0,1,2,3,4};
+#define siTeste 1000000
+    GoAlocacao *alocacoes = (GoAlocacao *) calloc(siTeste, sizeof(GoAlocacao));
+    srand(time(NULL));
 
-    generatePDF(GoSlice{ ids, 5,5 }, GoSlice{ ids, 5,5 }, GoSlice{ ids, 5,5 }, GoSlice{ ids, 5,5 }, GoSlice{ ids, 5,5 }, GoSlice{ ids, 5,5 });
+    for (int i = 0; i < siTeste; i++) {
+        auto id = rand() % 1000;
+        auto dataEntrega = (GoUint64) rand() % 1000000;
+        auto dataInicial = (GoUint64) rand() % 1000000;
+        auto dataFinal = (GoUint64) rand() % 100000000;
+        auto valor = (GoFloat64) (rand() % 10000);
+        auto multa = (GoFloat64) (rand() % 10000);
+        alocacoes[i] = createAlocacao(id, dataInicial, dataFinal, dataEntrega, valor, multa);
+    }
+
+    auto ret = generatePDF(GoSlice{alocacoes, siTeste});
+
+    std::ofstream te("local.pdf");
+
+    te.write((const char *) ret.r0, ret.r1);
+
+    te.flush();
+
+    te.close();
+
+    free(ret.r0);
+
+    delete[] alocacoes;
+
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
