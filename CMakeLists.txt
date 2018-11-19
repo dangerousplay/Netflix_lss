@@ -36,7 +36,7 @@ add_executable(${PROJECT_NAME}
         src/menus/relatorio.cpp
         src/menus/relatorio.h
         src/utils/unixTime.cpp
-        src/utils/unixTime.h)
+        src/utils/unixTime.h src/services/relatorio.cpp src/services/relatorio.h)
 
 include_directories(pdf)
 
