@@ -44,36 +44,6 @@ static void glfw_error_callback(int error, const char* description)
 
 int main(int, char**)
 {
-    //generatePDF(ids []int, dataInicial []uint64, dataFinal []uint64, dataEntrega []uint64, valores []float64, multas []float64) ([]byte, error)
-
-#define siTeste 1000000
-    GoAlocacao *alocacoes = (GoAlocacao *) calloc(siTeste, sizeof(GoAlocacao));
-    srand(time(NULL));
-
-    for (int i = 0; i < siTeste; i++) {
-        auto id = rand() % 1000;
-        auto dataEntrega = (GoUint64) rand() % 1000000;
-        auto dataInicial = (GoUint64) rand() % 1000000;
-        auto dataFinal = (GoUint64) rand() % 100000000;
-        auto valor = (GoFloat64) (rand() % 10000);
-        auto multa = (GoFloat64) (rand() % 10000);
-        alocacoes[i] = createAlocacao(id, dataInicial, dataFinal, dataEntrega, valor, multa);
-    }
-
-    auto ret = generatePDF(GoSlice{alocacoes, siTeste});
-
-    std::ofstream te("local.pdf");
-
-    te.write((const char *) ret.r0, ret.r1);
-
-    te.flush();
-
-    te.close();
-
-    free(ret.r0);
-
-    delete[] alocacoes;
-
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())

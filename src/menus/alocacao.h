@@ -46,6 +46,8 @@ private:
 
     void removeDuplicates(std::string &b);
 
+    void textColoredIfOut(Alocacao alocacao, ImVec4 color, const char *string);
+
 public:
     AlocacaoMenu();
 

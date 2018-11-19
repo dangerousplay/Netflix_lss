@@ -308,37 +308,78 @@ void AlocacaoMenu::render() {
                                 *atrasada.get() ? isOut : true;
                      });
 
+        if (!filtered.empty()) {
+            ImGui::PushID(10000);
+            ImGui::Text("Cliente ");
+            ImGui::NextColumn();
+            ImGui::Text("Filme ");
+            ImGui::NextColumn();
+            ImGui::Text("Inicio Alocação");
+            ImGui::NextColumn();
+            ImGui::Text("Fim alocação");
+            ImGui::NextColumn();
+            ImGui::Text("Valor ");
+            ImGui::NextColumn();
+            ImGui::Text("Paga ");
+            ImGui::NextColumn();
+            ImGui::Text("Entregue");
+
+            for (int i = 0; i < 5; i++) {
+                ImGui::NextColumn();
+            }
+
+            ImGui::PopID();
+        }
+
+        auto cor = ImColor::HSV(0, 1, 1);
+
         for (auto alocacao: filtered) {
             alocacao.init();
 
             ImGui::PushID(alocacao.id);
 
-            ImGui::Text(alocacao.cliente.nome.c_str());
+            textColoredIfOut(alocacao, cor, alocacao.cliente.nome.c_str());
 
             ImGui::NextColumn();
 
-            ImGui::Text(alocacao.filme.nome.c_str());
+            textColoredIfOut(alocacao, cor, alocacao.filme.nome.c_str());
 
             ImGui::NextColumn();
 
-            ImGui::Text(boost::gregorian::to_iso_extended_string(alocacao.periodoAlocacao.begin()).c_str());
+            textColoredIfOut(alocacao, cor,
+                             boost::gregorian::to_iso_extended_string(alocacao.periodoAlocacao.begin()).c_str());
 
             ImGui::NextColumn();
 
-            ImGui::Text(boost::gregorian::to_iso_extended_string(alocacao.periodoAlocacao.end()).c_str());
+            textColoredIfOut(alocacao, cor,
+                             boost::gregorian::to_iso_extended_string(alocacao.periodoAlocacao.end()).c_str());
 
             ImGui::NextColumn();
 
-            ImGui::Text(std::to_string(alocacao.valor).c_str());
+            if (alocacao.isAtrasada()) {
+                auto multa = (boost::gregorian::day_clock::local_day() - alocacao.periodoAlocacao.end()).days() * 0.4;
+                textColoredIfOut(alocacao, cor,
+                                 ((std::to_string(alocacao.valor) + " + ") + std::to_string(multa)).c_str());
+            } else {
+                textColoredIfOut(alocacao, cor, (std::to_string(alocacao.valor)).c_str());
+            }
+
 
             ImGui::NextColumn();
 
-            ImGui::Text("Paga: %s", alocacao.paga ? "Sim" : "Não");
+            textColoredIfOut(alocacao, cor, alocacao.paga ? "Sim" : "Não");
 
             ImGui::NextColumn();
 
-            ImGui::Text("Entregue: %s", alocacao.dataEntrega != 0 ? boost::gregorian::to_iso_extended_string(
-                    alocacao.dataEntregaP).c_str() : "");
+
+            if (alocacao.isAtrasada()) {
+                ImGui::TextColored(cor,
+                                   "Entregue: %s", alocacao.dataEntrega != 0 ? boost::gregorian::to_iso_extended_string(
+                                alocacao.dataEntregaP).c_str() : "");
+            } else {
+                ImGui::Text("Entregue: %s", alocacao.dataEntrega != 0 ? boost::gregorian::to_iso_extended_string(
+                        alocacao.dataEntregaP).c_str() : "");
+            }
 
             ImGui::NextColumn();
 
@@ -405,6 +446,8 @@ void AlocacaoMenu::render() {
                 clearAlocacao();
             }
 
+            ImGui::NextColumn();
+
             ImGui::PopID();
         }
 
@@ -465,6 +508,14 @@ void AlocacaoMenu::removeDuplicates(std::string &b) {
     messageFields.erase(std::remove_if(messageFields.begin(), messageFields.end(), [b](std::string a) {
         return a == b;
     }), messageFields.end());
+}
+
+void AlocacaoMenu::textColoredIfOut(Alocacao alocacao, ImVec4 color, const char *string) {
+    if (alocacao.isAtrasada()) {
+        ImGui::TextColored(color, string);
+    } else {
+        ImGui::Text(string);
+    }
 }
 
 

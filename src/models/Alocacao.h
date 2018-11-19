@@ -60,6 +60,8 @@ public:
   bool operator==(const Alocacao &rhs) const;
 
   bool operator!=(const Alocacao &rhs) const;
+
+    bool isAtrasada();
 };
 
 

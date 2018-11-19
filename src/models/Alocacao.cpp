@@ -88,5 +88,11 @@ void Alocacao::init() {
     Alocacao::dataEntregaP = to_bdate(dataEntrega);
 }
 
+bool Alocacao::isAtrasada() {
+    auto lepoch = toMillisecondsEpoch(boost::gregorian::day_clock::local_day());
+
+    return Alocacao::dataEntrega == 0 && Alocacao::dataFinal < lepoch;
+}
+
 
 
