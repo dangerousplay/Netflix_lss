@@ -19,6 +19,7 @@
 #include "menus/alocacao.h"
 #include <stdio.h>
 #include "pdf.h"
+#include "menus/relatorio.h"
 
 // About OpenGL function loaders: modern OpenGL doesn't have a standard header file and requires individual function pointers to be loaded manually.
 // Helper libraries are often used for this purpose! Here we are supporting a few common ones: gl3w, glew, glad.
@@ -108,8 +109,9 @@ int main(int, char**)
     auto filmeMenu = std::make_shared<FilmeMenu>();
     auto clienteMenu = std::make_shared<ClienteMenu>();
     auto alocacaoMenu = std::make_shared<AlocacaoMenu>();
+    auto relatorioMenu = std::make_shared<RelatorioMenu>();
 
-    std::vector<std::shared_ptr<IMenu>> menus = {filmeMenu, clienteMenu, alocacaoMenu};
+    std::vector<std::shared_ptr<IMenu>> menus = {filmeMenu, clienteMenu, alocacaoMenu, relatorioMenu};
 
     // Main loop
     while (!glfwWindowShouldClose(window))
