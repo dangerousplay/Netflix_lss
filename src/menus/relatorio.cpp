@@ -9,6 +9,7 @@
 #include "../utils/unixTime.h"
 #include "../services/relatorio.h"
 #include <fstream>
+#include <ostream>
 
 void RelatorioMenu::render() {
 
@@ -41,7 +42,7 @@ void RelatorioMenu::render() {
         try {
             auto pdf = relatorio.gerarRelatorio(allocacoes);
 
-            std::fstream file(buffer.get());
+            std::ofstream file(buffer.get(), std::fstream::in | std::fstream::out | std::fstream::trunc);
 
             file.write((const char *) pdf.r0, pdf.r1);
 

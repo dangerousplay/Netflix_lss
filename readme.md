@@ -1,7 +1,7 @@
 Componentes do Grupo: Davi Henrique, Josué William e Moisés Alcides
 
 
-https://i.imgur.com/Ik5SiRE.png
+![alt text](https://i.imgur.com/Ik5SiRE.png)
 
 
 To compile this project you will need CMake, GCC and Conan
