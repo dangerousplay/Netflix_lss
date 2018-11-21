@@ -28,6 +28,10 @@ void RelatorioMenu::render() {
         auto allocacoes = dbInstance->getStorage().get_all<Alocacao>(
                 where(c(&Alocacao::dataInicial) >= toMillisecondsEpoch(monthDate)));
 
+        for (auto &aloc: allocacoes) {
+            aloc.init();
+        }
+
         ServicoRelatorio relatorio = ServicoRelatorio();
 
         try {
